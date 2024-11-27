@@ -22,7 +22,15 @@ import CreateFilled from "../../../assets/png/create_filled.png";
 import Menu from "../../../assets/svg/menu.svg";
 import MenuFilled from "../../../assets/svg/menu_filled.svg";
 
+import LogoSvg from "../../../assets/svg/logo.svg";
+
+import useTailwindBreakpoint from "../../../context/useTailwindBreakpoint";
+import { useNavigate } from "react-router-dom";
+
 const SideBar = () => {
+    const { currentBreakpoint } = useTailwindBreakpoint();
+    const navigate = useNavigate();
+
     const sideBarItems = [
         {
             label: "Home",
@@ -58,20 +66,20 @@ const SideBar = () => {
 
     return (
         <div className="w-full h-full p-2 flex flex-col select-none">
-            <div className="w-full h-12 flex items-center p-3 mb-6">
-                <img src={Logo} className="h-full" alt="" draggable={false} />
+            <div className="w-full h-12 flex items-center p-1.5 xl:p-3 mb-6 cursor-pointer" onClick={() => navigate('/')}>
+                <img src={(currentBreakpoint !== 'md' && currentBreakpoint !== 'lg') ? Logo : LogoSvg} className="h-full" alt="" draggable={false} />
             </div>
             <div className="flex-grow flex flex-col gap-2">
-                {sideBarItems.map(item => (
-                    <div className="w-full h-14 flex items-center p-3 gap-3 rounded-lg hover:bg-slate-100 cursor-pointer">
-                        <img src={item.icon} alt="" className="h-full" draggable={false} />
-                        <div className="flex-grow text-xl">{item.label}</div>
+                {sideBarItems.map((item, index) => (
+                    <div className="w-full h-12 flex items-center gap-3 p-1.5 xl:p-3.5 rounded-lg hover:bg-slate-100 cursor-pointer" key={index}>
+                        <img src={item.icon} alt="" className="w-7" draggable={false} />
+                        {(currentBreakpoint !== 'md' && currentBreakpoint !== 'lg') && <div className="flex-grow text-xl">{item.label}</div>}
                     </div>
                 ))}
             </div>
-            <div className="w-full h-14 flex items-center p-3 gap-3 rounded-lg hover:bg-slate-100 cursor-pointer">
+            <div className="w-full h-12 flex items-center p-1.5 xl:p-3.5 gap-3 rounded-lg hover:bg-slate-100 cursor-pointer">
                 <img src={Menu} alt="" className="h-full" draggable={false} />
-                <div className="flex-grow text-xl">More</div>
+                {(currentBreakpoint !== 'md' && currentBreakpoint !== 'lg') &&<div className="flex-grow text-xl">More</div>}
             </div>
         </div>
     );

@@ -76,14 +76,15 @@ export const unauthFormStates = {
                     type: "password",
                 },
                 {
-                    id: "fullname",
+                    id: "fullName",
                     label: "Full Name",
                     type: "text",
                 }
             ],
             button: {
                 text: "Sign up",
-                action: APIsRoutes.Auth.SignUp
+                action: APIsRoutes.Auth.Register,
+                path: "log-in",
             },
             explainText: [
                 "People who use our service may have uploaded your contact infomation to Libriella.",
@@ -131,6 +132,7 @@ export const unauthFormStates = {
             ],
             button: {
                 text: "Back",
+                path: "forgot-password",
             },
         },
         formExtra: {

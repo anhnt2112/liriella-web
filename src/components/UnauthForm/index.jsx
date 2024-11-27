@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { AuthStateEnum } from "../../utils/unauth";
 import Input from "../Input";
 import { useMutation } from "@tanstack/react-query";
-import { APIsRoutes, baseURL, callApi } from "../../utils/services/ApiService";
+import { baseURL, callApi } from "../../utils/services/ApiService";
 
 const UnauthForm = () => {
     const location = useLocation();
@@ -18,11 +18,13 @@ const UnauthForm = () => {
 
     const { mutate, isLoading, isError } = useMutation({
         mutationFn: () => {
+            console.log("Mutate");
             return callApi(baseURL, content.button.action.path, content.button.action.method, formData);
         },
         onSuccess: (response) => {
             content.button.callback(response);
-            navigate(0);
+            if (!content.button.callback.path) navigate(0);
+            else navigate(`/${content.button.callback.path}`);
         }
     });
 
@@ -68,13 +70,13 @@ const UnauthForm = () => {
             </div>
             <div className="w-full flex flex-col gap-2 py-2">
                 {content.field.map(item => renderField(item))}
-                {content.link && content.link.map(item => (
-                    <div className="w-full h-fit items-center justify-center">{item}</div>
+                {content.link && content.link.map((item, index) => (
+                    <div className="w-full h-fit items-center justify-center" key={index}>{item}</div>
                 ))}
                 {content.explainText && <>
                 <div className="w-full px-4 md:px-5 py-1 flex flex-col gap-2">
-                    {content.explainText.map(text => (
-                        <div className="text-center text-sm">{text}</div>
+                    {content.explainText.map((text, index) => (
+                        <div className="text-center text-sm" key={index}>{text}</div>
                     ))}
                 </div>
             </>}
@@ -87,8 +89,8 @@ const UnauthForm = () => {
                     <div className="w-1/3 h-0.5 bg-ui-input-stroke" />
                 </div>
                 <div className="w-full flex flex-col px-9 md:px-10 gap-1 py-2 md:py-3">
-                    {content.extra.map(item => (
-                        <div className={"w-full h-fit flex items-center " + (!item.icon ? "justify-center" : "gap-2")}>
+                    {content.extra.map((item, index) => (
+                        <div className={"w-full h-fit flex items-center " + (!item.icon ? "justify-center" : "gap-2")} key={index}>
                             <img src={item.icon} alt="" className="h-3 md:h-4" />
                             <button className="font-medium hover:text-ui-blue" onClick={() => handleClick(item)}>{item.label}</button>
                         </div>

@@ -1,10 +1,11 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import SideBar from "../SideBar";
+import CreatePostModal from "../../CreatePostModal";
 
 const AuthLayout = () => {
 
-    return (
+    return (<>
         <div className="w-screen h-screen flex">
             <div className="w-0 md:w-14 xl:w-60 3xl:w-80">
                 <SideBar />
@@ -14,7 +15,8 @@ const AuthLayout = () => {
                 <Outlet />
             </div>
         </div>
-    );
+        <CreatePostModal />
+    </>);
 }
 
 export default AuthLayout;

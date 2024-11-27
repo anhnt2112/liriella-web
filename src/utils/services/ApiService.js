@@ -2,27 +2,30 @@ import axios from "axios";
 
 export const baseURL = "http://localhost:9000";
 
+const GET_METHOD = 'get';
+const POST_METHOD = 'post';
+
 export const APIsRoutes = {
     Auth: {
         Register: {
             path: "/auth/register",
-            method: 'POST'
+            method: POST_METHOD
         },
         Login: {
             path: "/auth/login",
-            method: "POST"
+            method: POST_METHOD
         },
         GoogleLogin: {
             path: "/auth/google",
-            method: "GET"
+            method: GET_METHOD 
         },
         FacebookLogin: {
             path: "/auth/facebook",
-            method: "GET"
+            method: GET_METHOD 
         },
         Config: {
             path: "/auth/config",
-            method: "GET"
+            method: GET_METHOD 
         }
     }
 }
@@ -44,6 +47,14 @@ export const callApi = async (
         data,
         params,
         headers: (isAuth && sessionId) ? { 'session-id': sessionId } : undefined
+    }
+
+    if (method === GET_METHOD) {
+        return axios.get(baseURL+path, { headers: (isAuth && sessionId) ? { 'session-id': sessionId } : undefined });
+    }
+
+    if (method === POST_METHOD) {
+        return axios.post(baseURL+path, data, { headers: (isAuth && sessionId) ? { 'session-id': sessionId } : undefined });
     }
 
     return axios(config);
