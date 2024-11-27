@@ -1,0 +1,12 @@
+1. Go to page
+2. Call api: POST /auth/form-content
+    Body: {
+        username?
+        state?
+    }
+3. Get:
+    {
+        isLinkedGoogleAccount?
+        question?
+        description: {}
+    }

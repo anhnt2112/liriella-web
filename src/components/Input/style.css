@@ -1,0 +1,42 @@
+/* styles.css */
+.input {
+    position: relative;
+    margin: 5px 0px;
+  }
+  
+  .input__label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: calc(var(--size-bezel) * 0.4) calc(var(--size-bezel) * .5);
+    margin: calc(var(--size-bezel) * 0.4 + 3px) calc(var(--size-bezel) * .5);
+    background: pink;
+    white-space: nowrap;
+    transform: translate(0, 0);
+    transform-origin: 0 0;
+    background: var(--color-background);
+    transition: transform 120ms ease-in;
+    font-weight: 500;
+    line-height: 1.2;
+    color: #152d32;
+  }
+  
+  .input__field {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    border: 1px solid black;
+    padding: calc(var(--size-bezel) * 0.8) var(--size-bezel);
+    color: black;
+    background: transparent;
+    border-radius: var(--size-radius);
+  
+    &:focus,
+    &:not(:placeholder-shown) {
+      + .input__label {
+        transform: translate(.25rem, -65%) scale(.8);
+        color: var(--color-accent);
+      }
+    }
+  }
+  
