@@ -135,7 +135,7 @@ const SideBar = () => {
 
             {/* More modal */}
             {isMoreOpen && <div 
-                className="absolute left-5 bottom-16 bg-white h-fit w-fit p-2 rounded-lg flex flex-col gap-2"
+                className="absolute left-5 bottom-16 bg-white z-40 h-fit w-fit p-2 rounded-lg flex flex-col gap-2"
                 style={{
                     boxShadow: "0 0 4px rgba(0, 0, 0, 0.3)"
                 }}

@@ -23,6 +23,17 @@ export const APIsRoutes = {
     Post: {
         Create: {
             path: "/post/create",
+        },
+        GetProfile: {
+            path: "/post/get-posts-by-username"
+        }
+    },
+    User: {
+        Profile: {
+            path: "/user/profile"
+        },
+        ProfileByUsername: {
+            path: "/user/profile-by-username"
         }
     }
 }

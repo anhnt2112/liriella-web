@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import SideBar from "../SideBar";
 import CreatePostModal from "../../CreatePostModal";
+import PostDetail from "../../PostDetail";
 
 const AuthLayout = () => {
 
@@ -16,6 +17,7 @@ const AuthLayout = () => {
             </div>
         </div>
         <CreatePostModal />
+        <PostDetail />
     </>);
 }
 

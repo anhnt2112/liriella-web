@@ -4,12 +4,16 @@ const ModalContext = createContext();
 
 export const ModalProvider = ({ children }) => {
   const [isCreatePost, setIsCreatePost] = useState(false);
+  const [detailPostId, setDetailPostId] = useState(null);
 
   const openCreatePost = () => setIsCreatePost(true);
   const closeCreatePost = () => setIsCreatePost(false);
 
+  const openDetailPost = (id) => setDetailPostId(id);
+  const closeDetailPost = () => setDetailPostId(null);
+
   return (
-    <ModalContext.Provider value={{ isCreatePost, openCreatePost, closeCreatePost }}>
+    <ModalContext.Provider value={{ isCreatePost, openCreatePost, closeCreatePost, detailPostId, openDetailPost, closeDetailPost }}>
       {children}
     </ModalContext.Provider>
   );
