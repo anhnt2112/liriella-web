@@ -26,10 +26,12 @@ import LogoSvg from "../../../assets/svg/logo.svg";
 
 import useTailwindBreakpoint from "../../../context/useTailwindBreakpoint";
 import { useNavigate } from "react-router-dom";
+import { useModal } from "../../../context/useModal";
 
 const SideBar = () => {
     const { currentBreakpoint } = useTailwindBreakpoint();
     const navigate = useNavigate();
+    const { openCreatePost } = useModal();
 
     const sideBarItems = [
         {
@@ -60,7 +62,8 @@ const SideBar = () => {
         {
             label: "Create",
             icon: Create,
-            activeIcon: CreateFilled
+            activeIcon: CreateFilled,
+            aciton: openCreatePost
         }
     ];
 
@@ -71,15 +74,15 @@ const SideBar = () => {
             </div>
             <div className="flex-grow flex flex-col gap-2">
                 {sideBarItems.map((item, index) => (
-                    <div className="w-full h-12 flex items-center gap-3 p-1.5 xl:p-3.5 rounded-lg hover:bg-slate-100 cursor-pointer" key={index}>
+                    <div className="w-full h-12 flex items-center gap-3 p-1.5 xl:p-3.5 rounded-lg hover:bg-slate-100 cursor-pointer" key={index} onClick={() => item.aciton()}>
                         <img src={item.icon} alt="" className="w-7" draggable={false} />
-                        {(currentBreakpoint !== 'md' && currentBreakpoint !== 'lg') && <div className="flex-grow text-xl">{item.label}</div>}
+                        {(currentBreakpoint !== 'md' && currentBreakpoint !== 'lg') && <div className="flex-grow text-base">{item.label}</div>}
                     </div>
                 ))}
             </div>
             <div className="w-full h-12 flex items-center p-1.5 xl:p-3.5 gap-3 rounded-lg hover:bg-slate-100 cursor-pointer">
                 <img src={Menu} alt="" className="h-full" draggable={false} />
-                {(currentBreakpoint !== 'md' && currentBreakpoint !== 'lg') &&<div className="flex-grow text-xl">More</div>}
+                {(currentBreakpoint !== 'md' && currentBreakpoint !== 'lg') &&<div className="flex-grow text-base">More</div>}
             </div>
         </div>
     );
