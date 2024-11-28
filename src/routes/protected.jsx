@@ -11,7 +11,7 @@ export const ProtectedAuth = ({ children }) => {
 export const ProtectedUnAuth = ({ children }) => {
     const sessionId = localStorage.getItem("session-id");
 
-    if (sessionId) return <Navigate to="/" replace />;
+    if (sessionId) return <Navigate to="/home" replace />;
 
     return children;
 }

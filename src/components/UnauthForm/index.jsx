@@ -5,7 +5,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { AuthStateEnum } from "../../utils/unauth";
 import Input from "../Input";
 import { useMutation } from "@tanstack/react-query";
-import { baseURL, callApi } from "../../utils/services/ApiService";
+import { baseURL } from "../../utils/services/ApiService";
+import axios from "axios";
 
 const UnauthForm = () => {
     const location = useLocation();
@@ -18,8 +19,8 @@ const UnauthForm = () => {
 
     const { mutate, isLoading, isError } = useMutation({
         mutationFn: () => {
-            console.log("Mutate");
-            return callApi(baseURL, content.button.action.path, content.button.action.method, formData);
+            // return callApi(baseURL, content.button.action.path, content.button.action.method, formData);
+            return axios.post(baseURL+content.button.action.path, formData);
         },
         onSuccess: (response) => {
             content.button.callback(response);

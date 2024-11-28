@@ -12,6 +12,9 @@ export default {
         "ui-input-stroke": "#A3A3A3",
         "ui-input-fill": "#E4E4E4",
         "ui-input-placeholder": "#3B3B3B"
+      },
+      aspectRatio: {
+        '2/3': '2 / 3',
       }
     },
   },

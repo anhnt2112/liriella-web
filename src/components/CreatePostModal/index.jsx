@@ -3,6 +3,9 @@ import Book from "../../assets/svg/book.svg";
 import LeftArrow from "../../assets/svg/left-arrow.svg";
 import { motion } from "motion/react";
 import { useModal } from "../../context/useModal";
+import { baseURL, APIsRoutes } from "../../utils/services/ApiService";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 
 const CreatePostModal = () => {
   const { isCreatePost, closeCreatePost } = useModal();
@@ -12,6 +15,24 @@ const CreatePostModal = () => {
   const [step, setStep] = useState(0);
   const [showDiscardPost, setShowDiscardPost] = useState(false);
   const createPostRef = useRef(null);
+
+  const { mutate } = useMutation({
+    mutationFn: () => {
+      const formData = new FormData();
+      formData.append("image", image);
+      formData.append("description", content.description);
+      formData.append("bookName", content.bookName);
+      formData.append("linkToBuy", content.linkToBuy);
+      formData.append("isFavorite", content.isFavorite);
+
+      return axios.post(baseURL+APIsRoutes.Post.Create.path, formData, { headers: {
+        'session-id': localStorage.getItem('session-id')
+      }});
+    },
+    onSuccess: () => {
+      handleDiscard();
+    }
+  });
 
   useEffect(() => {
     if (step < 2) setContent(null);
@@ -58,12 +79,12 @@ const CreatePostModal = () => {
   const handleNext = () => {
     if (step === 1) setContent({
       description: "",
-      name: "",
-      link: "",
+      bookName: "",
+      linkToBuy: "",
       isFavorite: false
     });
     if (step === 2) {
-      console.log(content);
+      mutate();
     } else setStep(step + 1);
   }
 
@@ -105,8 +126,8 @@ const CreatePostModal = () => {
               <div className="flex-grow font-medium text-base">7u4n_4nh</div>
             </div>
             <textarea maxLength={2024} className="h-1/2 p-1 text-sm focus:outline-none" placeholder="Description" value={content?.description} onChange={(e) => setContent({...content, description: e.target.value})} />
-            <input className="p-1 text-sm focus:outline-none" placeholder="Book's name" value={content?.name} onChange={(e) => setContent({...content, name: e.target.value})} />
-            <input className="p-1 text-sm focus:outline-none" placeholder="Link to buy" value={content?.link} onChange={(e) => setContent({...content, link: e.target.value})} />
+            <input className="p-1 text-sm focus:outline-none" placeholder="Book's name" value={content?.bookName} onChange={(e) => setContent({...content, bookName: e.target.value})} />
+            <input className="p-1 text-sm focus:outline-none" placeholder="Link to buy" value={content?.linkToBuy} onChange={(e) => setContent({...content, linkToBuy: e.target.value})} />
             <div className="w-full flex items-center justify-between p-1">
               <div className="text-base">Mark as Favorite</div>
               <motion.div 
