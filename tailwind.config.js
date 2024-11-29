@@ -9,7 +9,7 @@ export default {
       colors: {
         "ui-stroke": "#464646",
         "ui-blue": "#7D4EE9",
-        "ui-input-stroke": "#A3A3A3",
+        "ui-input-stroke": "#DBDBDB",
         "ui-input-fill": "#E4E4E4",
         "ui-input-placeholder": "#3B3B3B"
       },
