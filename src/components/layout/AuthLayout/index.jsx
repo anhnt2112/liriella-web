@@ -3,12 +3,13 @@ import { Outlet } from "react-router-dom";
 import SideBar from "../SideBar";
 import CreatePostModal from "../../CreatePostModal";
 import PostDetail from "../../PostDetail";
+import RelationModal from "../../RelationModal";
 
 const AuthLayout = () => {
 
     return (<>
         <div className="w-screen h-screen flex">
-            <div className="w-0 md:w-14 xl:w-60">
+            <div className="hidden md:inline md:w-14 xl:w-60">
                 <SideBar />
             </div>
             <div className="w-[1px] h-full bg-ui-input-stroke" />
@@ -18,6 +19,7 @@ const AuthLayout = () => {
         </div>
         <CreatePostModal />
         <PostDetail />
+        <RelationModal />
     </>);
 }
 

@@ -34,6 +34,12 @@ export const APIsRoutes = {
         },
         ProfileByUsername: {
             path: "/user/profile-by-username"
+        },
+        FollowUser: {
+            path: "/user/follow"
+        },
+        UnFollowUser: {
+            path: "/user/unfollow"
         }
     }
 }
