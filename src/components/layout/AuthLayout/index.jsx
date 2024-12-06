@@ -4,6 +4,8 @@ import SideBar from "../SideBar";
 import CreatePostModal from "../../CreatePostModal";
 import PostDetail from "../../PostDetail";
 import RelationModal from "../../RelationModal";
+import UpdateAvatarModal from "../../UpdateAvatarModal";
+import PreviewUser from "../../PreviewUser";
 
 const AuthLayout = () => {
 
@@ -20,6 +22,8 @@ const AuthLayout = () => {
         <CreatePostModal />
         <PostDetail />
         <RelationModal />
+        <UpdateAvatarModal />
+        <PreviewUser />
     </>);
 }
 

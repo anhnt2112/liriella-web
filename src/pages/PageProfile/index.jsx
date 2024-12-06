@@ -11,22 +11,27 @@ import Heart from "../../assets/png/heart.png";
 import HeartFilled from "../../assets/png/heart_filled.png";
 import PostPreview from "../../components/PostPreview";
 import useUser from "../../context/useUser";
+import { useModal } from "../../context/useModal";
+import DefaultAvatar from "../../assets/jpg/default_avt.jpg";
+import NoteBox from "../../components/NoteBox";
 
 const PageProfile = () => {
   const [inFavorite, setInFavorite] = useState(false);
   const location = useLocation();
   const { user } = useUser();
   const username = (location.pathname.split("/")[2] ?? user?.username) ?? "";
+  const { openRelationModal, setInFollowing, setInFollowers, openChangeAvatar } = useModal();
+  console.log(username);
 
   const { data: profile, isLoading: isProfileLoading, refetch } = useQuery({
     queryKey: ['profileInfo', username],
     queryFn: async () => {
-      if (!username.length) return;
       const addedPath = `/${username}`;
       return axios.get(baseURL+APIsRoutes.User.ProfileByUsername.path+addedPath, { headers: {
         'session-id': localStorage.getItem('session-id')
       }});
     },
+    enabled: !!username
   });
 
   const { data, isLoading: isLoadingPost} = useQuery({
@@ -37,6 +42,7 @@ const PageProfile = () => {
         'session-id': localStorage.getItem('session-id')
       }});
     },
+    enabled: !!username
   });
 
   const { mutate, isLoading: isLoadingMutate } = useMutation({
@@ -63,20 +69,43 @@ const PageProfile = () => {
     }
   }
 
+  const handleOpenFollowers = () => {
+    openRelationModal(username);
+    setInFollowers(true);
+  }
+
+  const handleOpenFollowing = () => {
+    openRelationModal(username);
+    setInFollowing(true);
+  }
+
+  const handleChangeAvatar = () => {
+    if (user?.username === username) {
+      openChangeAvatar();
+    }
+  }
+
+  const handleChangeNote = () => {
+    console.log("Change note");
+  }
+
   return (
     <div className="w-full h-screen flex justify-center select-none">
       <div className="w-full max-w-[1024px]">
         {/* Profile */}
         {isProfileLoading ? <div>Loading...</div> : profile?.data ? 
         <div className="w-full px-20 py-10 flex items-center md:gap-10 lg:gap-20">
-          <img src="https://imgs.search.brave.com/DzYUMuG6uVmYZmZQgrATGPCHt8EYwZUw5lH9TKjuVFo/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9kMzhi/MDQ0cGV2bndjOS5j/bG91ZGZyb250Lm5l/dC9jdXRvdXQtbnV4/dC9jYXJ0b29uL25l/dy8xMy5qcGc" className="rounded-full w-40 h-40" draggable={false} />
+          <div className="relative flex justify-center pt-6">
+            <img src={profile?.data.avatar ? baseURL + profile?.data.avatar : DefaultAvatar} className="rounded-full w-40 h-40 hover:cursor-pointer object-cover object-center" draggable={false} onClick={handleChangeAvatar} />
+            <NoteBox className="top-0 left-0 max-w-full text-xs h-12" note = "Aaa cannot live without coffee!" onClick={handleChangeNote} />
+          </div>
           <div className="flex-grow h-full flex flex-col gap-3">
             <div className="w-full flex items-center gap-4">
               <div className="text-xl">{profile.data.username}</div>
               <div className="bg-[#0095F6] px-4 py-1 text-white rounded-xl hover:cursor-pointer font-medium" onClick={handleClick}>
                 {user.username === username ? "Edit profile" : !profile.data.followers.includes(user.username) ? "Follow" : "Unfollow"}
               </div>
-              <div className="bg-[#EFEFEF] px-4 py-1 rounded-xl font-medium hover:cursor-pointer">
+              <div className="bg-[#EFEFEF] px-4 py-1 rounded-xl font-medium hover:cursor-pointer hover:bg-[#d7d7d7]">
                 {user.username === username ? "Setting" : "Message"}
               </div>
             </div>
@@ -85,11 +114,11 @@ const PageProfile = () => {
                 <div className="font-semibold">2</div>
                 <div>posts</div>
               </div>
-              <div className="flex gap-1 text-lg hover:cursor-pointer active:opacity-60">
+              <div className="flex gap-1 text-lg hover:cursor-pointer active:opacity-60" onClick={handleOpenFollowers}>
                 <div className="font-semibold">{profile.data.followers.length}</div>
                 <div>followers</div>
               </div>
-              <div className="flex gap-1 text-lg hover:cursor-pointer active:opacity-60">
+              <div className="flex gap-1 text-lg hover:cursor-pointer active:opacity-60" onClick={handleOpenFollowing}>
                 <div className="font-semibold">{profile.data.following.length}</div>
                 <div>following</div>
               </div>

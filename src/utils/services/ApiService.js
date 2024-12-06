@@ -26,6 +26,9 @@ export const APIsRoutes = {
         },
         GetProfile: {
             path: "/post/get-posts-by-username"
+        },
+        Preview: {
+            path: "/post/preview"
         }
     },
     User: {
@@ -40,6 +43,15 @@ export const APIsRoutes = {
         },
         UnFollowUser: {
             path: "/user/unfollow"
+        },
+        Connections: {
+            path: "/user/connections"
+        },
+        UpdateAvatar: {
+            path: "/user/update-avatar"
+        },
+        RemoveAvatar: {
+            path: "/user/remove-avatar"
         }
     }
 }

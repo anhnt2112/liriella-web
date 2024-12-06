@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from "react";
 import useUser from "../../context/useUser";
 import CreateFilled from "../../assets/png/create_filled.png";
 import EnterIcon from "../../assets/png/enter.png";
+import DefaultAvatar from "../../assets/jpg/default_avt.jpg"
+import NoteBox from "../../components/NoteBox";
 
 const PageMessage = () => {
   const { user } = useUser();
@@ -58,12 +60,19 @@ const PageMessage = () => {
         </div>
         <div className="flex-grow flex flex-col overflow-y-auto">
           {/* Avatar and name */}
-          <div className="w-full h-fit py-5 px-2 flex">
-            <div className="w-14 h-14 rounded-full bg-red-300 mx-2"></div>
-            <div className="w-14 h-14 rounded-full bg-red-300 mx-2"></div>
+          <div className="w-full h-fit py-5 px-4 flex gap-3">
+            <div className="relative flex justify-center pt-8 w-24">
+              <img src={DefaultAvatar} className="rounded-full w-16 h-16" draggable={false} />
+              <NoteBox className="top-0 left-0 max-w-full h-12 text-[10px]" note = "Aaa cannot live without coffee!" />
+            </div>
+
+            <div className="relative flex justify-center pt-8 w-24">
+              <img src={DefaultAvatar} className="rounded-full w-16 h-16" draggable={false} />
+              <NoteBox className="top-0 left-0 max-w-full h-12 text-[10px]" />
+            </div>
           </div>
           {/* Conversation */}
-          <div className="w-full h-fit py-5 px-4 flex items-center justify-between select-none">
+          <div className="w-full h-fit py-5 px-4 pt-0 flex items-center justify-between select-none">
             <div className="font-medium text-lg hover:cursor-pointer">Message</div>
             <div className="font-medium text-lg hover:cursor-pointer opacity-30">Request</div>
           </div>
