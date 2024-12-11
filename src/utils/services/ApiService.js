@@ -53,5 +53,21 @@ export const APIsRoutes = {
         RemoveAvatar: {
             path: "/user/remove-avatar"
         }
+    },
+    Conversation: {
+        Post: {
+            path: "/conversations"
+        },
+        Get: {
+            path: "/conversations"
+        }
+    },
+    Message: {
+        GetByConversationId: {
+            path: "/messages"
+        },
+        Post: {
+            path: "/messages"
+        }
     }
 }

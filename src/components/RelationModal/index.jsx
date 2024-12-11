@@ -20,6 +20,8 @@ const RelationModal = () => {
     enabled: !!relationUsername
   });
 
+  console.log(data);
+
   const handleMouseEnter = (_username, ref) => {
     if (!ref) return;
     const rect = ref.current.getBoundingClientRect();

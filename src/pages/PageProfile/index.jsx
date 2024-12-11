@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { baseURL, APIsRoutes } from "../../utils/services/ApiService";
 import axios from "axios";
@@ -18,10 +18,10 @@ import NoteBox from "../../components/NoteBox";
 const PageProfile = () => {
   const [inFavorite, setInFavorite] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useUser();
   const username = (location.pathname.split("/")[2] ?? user?.username) ?? "";
   const { openRelationModal, setInFollowing, setInFollowers, openChangeAvatar } = useModal();
-  console.log(username);
 
   const { data: profile, isLoading: isProfileLoading, refetch } = useQuery({
     queryKey: ['profileInfo', username],
@@ -60,12 +60,33 @@ const PageProfile = () => {
     }
   });
 
+  const { mutate: goToConversation, isLoading: isLoadingConversation } = useMutation({
+    mutationFn: () => {
+      if (!user || !profile.data) return;
+      if (user?.username === username) return;
+      return axios.post(baseURL+APIsRoutes.Conversation.Post.path, { receiver: username }, { headers: {
+        'session-id': localStorage.getItem('session-id')
+      }});
+    },
+    onSuccess: (response) => {
+      navigate(`/message/${response.data._id}`);
+    }
+  })
+
   const handleClick = () => {
     // if (!user) return;
     if (user?.username === username) {
       console.log("Edit profile");
     } else {
       mutate();
+    }
+  }
+
+  const handleMessage = () => {
+    if (user?.username === username) {
+      console.log("Go to setting");
+    } else {
+      goToConversation();
     }
   }
 
@@ -102,10 +123,10 @@ const PageProfile = () => {
           <div className="flex-grow h-full flex flex-col gap-3">
             <div className="w-full flex items-center gap-4">
               <div className="text-xl">{profile.data.username}</div>
-              <div className="bg-[#0095F6] px-4 py-1 text-white rounded-xl hover:cursor-pointer font-medium" onClick={handleClick}>
+              <div className="bg-[#0095F6] px-4 py-1 text-white rounded-xl hover:cursor-pointer hover:bg-[#3F00FF] font-medium" onClick={handleClick}>
                 {user.username === username ? "Edit profile" : !profile.data.followers.includes(user.username) ? "Follow" : "Unfollow"}
               </div>
-              <div className="bg-[#EFEFEF] px-4 py-1 rounded-xl font-medium hover:cursor-pointer hover:bg-[#d7d7d7]">
+              <div className="bg-[#EFEFEF] px-4 py-1 rounded-xl font-medium hover:cursor-pointer hover:bg-[#d7d7d7]" onClick={handleMessage}>
                 {user.username === username ? "Setting" : "Message"}
               </div>
             </div>
