@@ -1,14 +1,17 @@
 import React, { useRef, useState, useEffect } from "react";
+import { motion } from "motion/react";
+
 import Logo from "../../../assets/png/logo.png";
+import LogoSvg from "../../../assets/svg/logo.svg";
 
 import Home from "../../../assets/svg/home.svg";
 import HomeFilled from "../../../assets/svg/home_filled.svg";
 
 import Search from "../../../assets/svg/search.svg";
-import SearchFilled from "../../../assets/svg/search_filled.svg";
+import SearchFilled from "../../../assets/png/search_filled.png";
 
-import Explore from "../../../assets/png/explore.png";
-import ExploreFilled from "../../../assets/png/explore_filled.png";
+import Explore from "../../../assets/png/compass.png";
+import ExploreFilled from "../../../assets/png/compass_filled.png";
 
 import Message from "../../../assets/svg/mesage.svg";
 import MessageFilled from "../../../assets/svg/message_filled.svg";
@@ -22,7 +25,6 @@ import CreateFilled from "../../../assets/png/create_filled.png";
 import Menu from "../../../assets/svg/menu.svg";
 import MenuFilled from "../../../assets/svg/menu_filled.svg";
 
-import LogoSvg from "../../../assets/svg/logo.svg";
 import DefaultAvatar from "../../../assets/png/avatar.png";
 import DefaultAvatarFilled from "../../../assets/png/avatar_filled.png";
 
@@ -30,18 +32,37 @@ import SettingIcon from "../../../assets/png/setting.png";
 import ActivityIcon from "../../../assets/png/activities.png";
 import LogoutIcon from "../../../assets/png/logout.png";
 
+import BookIcon from "../../../assets/png/book.png";
+import DefaultAvt from "../../../assets/jpg/default_avt.jpg";
+
 import useTailwindBreakpoint from "../../../context/useTailwindBreakpoint";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useModal } from "../../../context/useModal";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { APIsRoutes, baseURL } from "../../../utils/services/ApiService";
+import useNotificationSocket from "../../../context/useNotificationSocket";
+import useUser from "../../../context/useUser";
 
 const SideBar = () => {
     const { currentBreakpoint } = useTailwindBreakpoint();
     const navigate = useNavigate();
     const location = useLocation();
-    const { openCreatePost, isCreatePost } = useModal();
-
+    const { openCreatePost, isCreatePost, openDetailPost } = useModal();
+    const { user } = useUser();
+    const { registerUser } = useNotificationSocket();
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(currentBreakpoint === 'md' || currentBreakpoint === 'lg');
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isNotiOpen, setIsNotiOpen] = useState(false);
     const [isMoreOpen, setIsMoreOpen] = useState(false);
+    const [onSearchByUsername, setOnSearchByUsername] = useState(true);
+    const [searchContent, setSearchContent] = useState("");
+    const sidebarRef = useRef(null);
     const moreModalRef = useRef(null);
+    const [notiState, setNotiState] = useState({
+        isPost: false,
+        isComment: false
+    });
 
     const sideBarItems = [
         {
@@ -55,7 +76,8 @@ const SideBar = () => {
             id: "search",
             label: "Search",
             icon: Search,
-            activeIcon: SearchFilled
+            activeIcon: SearchFilled,
+            action: () => {setIsSearchOpen(true); setIsNotiOpen(false);}
         },
         {
             id: "explore",
@@ -75,7 +97,8 @@ const SideBar = () => {
             id: "notification",
             label: "Notification",
             icon: Noti,
-            activeIcon: NotiFilled
+            activeIcon: NotiFilled,
+            action: () => {setIsNotiOpen(true); setIsSearchOpen(false);}
         },
         {
             id: "create",
@@ -93,10 +116,73 @@ const SideBar = () => {
         }
     ];
 
+    const notificationItems = [
+        {
+            id: "followers",
+            label: "Followers"
+        },
+        {
+            id: "posts",
+            label: "Posts"
+        },
+        {
+            id: "comments",
+            label: "Comments"
+        }
+    ];
+
+    const handleClickNotiItem = (id) => {
+        if (id === 'followers') {
+            setNotiState({
+                isPost: false
+            });
+            return;
+        }
+        if (id === 'posts') {
+            setNotiState({
+                isPost: true,
+                isComment: false
+            });
+            return;
+        }
+        if (id === 'comments') {
+            setNotiState({
+                isPost: true,
+                isComment: true
+            });
+            return;
+        }
+    }
+
+    const handleGetActiveNotiItem = (id) => {
+        if (id === "followers") return !notiState.isPost;
+        if (id === "posts") return notiState.isPost && !notiState.isComment;
+        if (id === "comments") return notiState.isPost && notiState.isComment;
+        return false;
+    }
+
+    const handleClickNotification = (item) => {
+        if (!item.postId) navigate(`profile/${item.creatorId.username}`);
+        else {
+            console.log("Open post");
+        }
+    }
+
+    useEffect(() => {
+        if (user?._id) {
+            registerUser(user?._id);
+        }
+    }, [user]);
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (moreModalRef.current && !moreModalRef.current.contains(event.target)) {
                 setIsMoreOpen(false);
+            }
+            if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+                setIsNotiOpen(false);
+                setIsSearchOpen(false);
+                setSearchContent("");
             }
         }
     
@@ -106,32 +192,149 @@ const SideBar = () => {
         }
     }, []);
 
+    
+
     const getActiveStatus = (id) => {
+        if (isMoreOpen) return false;
         if (isCreatePost) {
             return id === "create";
+        } else if (isSearchOpen) {
+            return id === "search";
+        } else if (isNotiOpen) {
+            return id === "notification";
         } else {
             const path = location.pathname.split('/')[1];
             return path === id;
         }
     }
 
-    return (
-        <div className="w-full h-full p-2 flex flex-col select-none relative">
-            <div className="w-full h-12 flex items-center p-1.5 xl:p-3 mb-6 cursor-pointer" onClick={() => navigate('home')}>
-                <img src={(currentBreakpoint !== 'md' && currentBreakpoint !== 'lg') ? Logo : LogoSvg} className="h-full" alt="" draggable={false} />
-            </div>
+    const switchToUsernameSearch = () => {
+        if (!onSearchByUsername) {
+            setOnSearchByUsername(true);
+            setSearchContent("");
+        }
+    }
+
+    const switchToBookNameSearch = () => {
+        if (onSearchByUsername) {
+            setOnSearchByUsername(false);
+            setSearchContent("");
+        }
+    }
+
+    useEffect(() => {
+        setIsSidebarCollapsed(currentBreakpoint === 'md' || currentBreakpoint === 'lg');
+    }, [currentBreakpoint]);
+
+    const { data: searchResult, isLoading: isLoadingSearchResult, refetch: refetchSearch } = useQuery({
+        queryKey: ["search", searchContent, onSearchByUsername],
+        queryFn: () => {
+            const addedPath = onSearchByUsername ? `?username=${searchContent}` : `?bookName=${searchContent}`;
+            const apiPath = onSearchByUsername ? APIsRoutes.User.Search.path : APIsRoutes.Post.Search.path;
+            return axios.get(baseURL+apiPath+addedPath);
+        },
+        enabled: !!searchContent
+    });
+
+    const { data: notification, isLoading: isLoadingNotification, refetch: refetchNotification } = useQuery({
+        queryKey: ["notification"],
+        queryFn: () => {
+            return axios.get(baseURL+APIsRoutes.Notification.Get.path, { headers: {
+                'session-id': localStorage.getItem('session-id')
+            }});
+        }
+    });
+
+    const defaultText = (createAt) => {
+        if (!createAt) return;
+        const date = new Date(createAt);
+    
+        const formattedDate = new Intl.DateTimeFormat("en-US", {
+          month: "short",
+          day: "2-digit",
+          year: "numeric"
+        }).format(date);
+    
+        return `${formattedDate}`;
+    }
+
+    const handleGoToProfile = (username) => {
+        setSearchContent("");
+        setIsSearchOpen(false);
+        setIsNotiOpen(false);
+        navigate(`profile/${username}`);
+    }
+
+    const handleOpenPost = (postId) => {
+        openDetailPost(postId);
+    }
+
+    return (<div className="w-fit h-full flex relative" ref={sidebarRef}>
+        <motion.div 
+            className="h-full p-2 flex flex-col select-none relative border-r-[1px] border-ui-input-stroke overflow-hidden"
+            initial={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { width: "56px" } : { width: "240px" }}
+            animate={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { width: "56px" } : { width: "240px" }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+        >
+            <motion.div 
+                className="w-full h-12 flex items-center mb-6 hover:cursor-pointer relative" 
+                onClick={() => navigate('home')}
+                initial={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { padding: "6px" } : { padding: "12px" }}
+                animate={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { padding: "6px" } : { padding: "12px" }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+            >
+                <motion.img 
+                    src={LogoSvg} className="h-9" alt="" draggable={false}
+                    initial={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { display: 1 } : { opacity: 0 }}
+                    animate={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { opacity: 1 } : { opacity: 0 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                />
+
+                <motion.img 
+                    src={Logo} className="h-full absolute inset-0 p-3" alt="" draggable={false}
+                    initial={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { opacity: 0 } : { opacity: 1 }}
+                    animate={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { opacity: 0 } : { opacity: 1 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                />
+            </motion.div>
             <div className="flex-grow flex flex-col gap-2">
                 {sideBarItems.map((item, index) => (
-                    <div className="w-full h-12 flex items-center gap-3 p-1.5 xl:p-3.5 rounded-lg hover:bg-slate-100 cursor-pointer" key={index} onClick={() => item.action()}>
+                    <motion.div 
+                        className="w-full h-12 flex items-center gap-3 rounded-lg hover:bg-slate-100 hover:cursor-pointer" 
+                        key={index} onClick={() => item.action()}
+                        initial={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { padding: "6px" } : { padding: "14px" }}
+                        animate={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { padding: "6px" } : { padding: "14px" }}
+                        transition={{ duration: 0.5, ease: "easeInOut" }}
+                    >
                         <img src={getActiveStatus(item.id) ? item.activeIcon : item.icon} alt="" className="w-7" draggable={false} />
-                        {(currentBreakpoint !== 'md' && currentBreakpoint !== 'lg') && <div className={"flex-grow text-base " + (getActiveStatus(item.id) ? "font-semibold" : "")}>{item.label}</div>}
-                    </div>
+                        <motion.div 
+                            className={"flex-grow text-base " + (getActiveStatus(item.id) ? "font-semibold" : "")}
+                            initial={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { width: 0, opacity: 0 } : { width: "fit-content", opacity: 1 }}
+                            animate={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { width: 0, opacity: 0 } : { width: "fit-content", opacity: 1 }}
+                            transition={{ duration: 0.5, ease: "easeInOut" }}
+                        >
+                            {item.label}
+                        </motion.div>
+                    </motion.div>
                 ))}
             </div>
-            <div className="w-full h-12 flex items-center p-1.5 xl:p-3.5 gap-3 rounded-lg hover:bg-slate-100 cursor-pointer" onClick={() => setIsMoreOpen(true)}>
+            <motion.div 
+                className="w-full h-12 flex items-center gap-3 rounded-lg hover:bg-slate-100 hover:cursor-pointer" 
+                onClick={() => setIsMoreOpen(true)}
+                initial={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { padding: "6px" } : { padding: "14px" }}
+                animate={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { padding: "6px" } : { padding: "14px" }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+            >
                 <img src={isMoreOpen ? MenuFilled : Menu} alt="" className="h-full" draggable={false} />
-                {(currentBreakpoint !== 'md' && currentBreakpoint !== 'lg') && <div className={"flex-grow text-base " + (isMoreOpen ? "font-semibold" : "")}>More</div>}
-            </div>
+                <motion.div 
+                    className={"flex-grow text-base " + (isMoreOpen ? "font-semibold" : "")}
+                    initial={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { width: 0, opacity: 0 } : { width: "fit-content", opacity: 1 }}
+                    animate={(isSidebarCollapsed || isSearchOpen || isNotiOpen) ? { width: 0, opacity: 0 } : { width: "fit-content", opacity: 1 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                >
+                    More
+                </motion.div>
+            </motion.div>
 
             {/* More modal */}
             {isMoreOpen && <div 
@@ -141,22 +344,107 @@ const SideBar = () => {
                 }}
                 ref={moreModalRef}
             >
-                <div className="px-2 h-10 w-48 flex items-center rounded-lg hover:bg-slate-100 cursor-pointer gap-3">
+                <div className="px-2 h-10 w-48 flex items-center rounded-lg hover:bg-slate-100 hover:cursor-pointer gap-3">
                     <img src={SettingIcon} alt="setting" className="w-6" />
                     <div className="flex-grow text-sm">Setting</div>
                 </div>
-                <div className="px-2 h-10 w-48 flex items-center rounded-lg hover:bg-slate-100 cursor-pointer gap-3">
+                <div className="px-2 h-10 w-48 flex items-center rounded-lg hover:bg-slate-100 hover:cursor-pointer gap-3">
                     <img src={ActivityIcon} alt="setting" className="w-6 p-0.5" />
                     <div className="flex-grow w-full text-sm">Your Activities</div>
                 </div>
                 <div className="w-full h-[1px] bg-slate-100" />
-                <div className="px-2 h-10 w-48 flex items-center rounded-lg hover:bg-slate-100 cursor-pointer gap-3">
+                <div className="px-2 h-10 w-48 flex items-center rounded-lg hover:bg-slate-100 hover:cursor-pointer gap-3">
                     <img src={LogoutIcon} alt="setting" className="w-6 p-0.5" />
                     <div className="flex-grow w-full text-sm">Log Out</div>
                 </div>
             </div>}
-        </div>
-    );
+        </motion.div>
+        <motion.div
+            className="h-full rounded-r-2xl border-r-[1px] border-ui-input-stroke overflow-hidden flex flex-col absolute top-0 left-full z-20 bg-white"
+            initial={(isSearchOpen || isNotiOpen) ? { width: "400px", opacity: 1 } : { width: "0px", opacity: 0 }}
+            animate={(isSearchOpen || isNotiOpen) ? { width: "400px", opacity: 1 } : { width: "0px", opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            style={{
+                boxShadow: "4px 0 4px rgba(0, 0, 0, 0.05)"
+            }}
+        >
+            {isSearchOpen &&
+            <>
+                <div className="text-2xl w-full font-semibold px-3 py-5">
+                    Search
+                </div>
+                <div className="w-full flex flex-col flex-grow gap-3">
+                    <div className="px-3">
+                        <div className="h-10 rounded-md bg-[#EFEFEF] flex overflow-hidden">
+                            <motion.div className={onSearchByUsername ? "flex-grow" : "flex-grow-0 hover:cursor-pointer hover:bg-slate-200 px-2 flex items-center justify-center"} onClick={switchToUsernameSearch}>
+                                {onSearchByUsername ? <input className="px-3 h-full text-sm bg-transparent focus:outline-none" placeholder="Search by username" value={searchContent} onChange={(e) => setSearchContent(e.target.value)}/> : <img src={DefaultAvatar} alt="" className="h-6" />}
+                            </motion.div>
+                            <motion.div className={"border-l-[1px] border-ui-input-stroke " +  (!onSearchByUsername ? "flex-grow" : "flex-grow-0 hover:cursor-pointer hover:bg-slate-200 px-2 flex items-center justify-center")} onClick={switchToBookNameSearch}>
+                                {!onSearchByUsername ? <input className="px-3 h-full text-sm bg-transparent focus:outline-none" placeholder={`Search by book${`'`}s name`} value={searchContent} onChange={(e) => setSearchContent(e.target.value)}/> : <img src={BookIcon} alt="" className="h-6"/>}
+                            </motion.div>
+                        </div>
+                    </div>
+                    <div className="flex-grow overflow-hidden overflow-y-scroll">
+                        {(searchResult?.data ?? []).map((item, index) => (
+                            onSearchByUsername ? (
+                            <div className="w-full flex p-3 hover:bg-slate-100 hover:cursor-pointer gap-3 select-none" key={index} onClick={() => handleGoToProfile(item.username)}>
+                                <img src={item.avatar ? baseURL+item.avatar : DefaultAvatar} alt="" className="h-11 w-11 rounded-full" draggable={false} />
+                                <div className="flex-grow flex flex-col justify-center text-md">
+                                    <div className="font-medium">{item.username}</div>
+                                    <div className="font-normal opacity-70 text-md flex overflow-hidden gap-1">
+                                        <div>{item.fullName}</div>
+                                        &#x2022;
+                                        <div>{`${item.followers.length} followers`}</div>
+                                    </div>
+                                </div>
+                            </div>) : (
+                            <div className="w-full flex p-3 hover:bg-slate-100 hover:cursor-pointer gap-3 select-none" key={index} onClick={() => handleOpenPost(item._id)}>
+                                <img src={baseURL+item.image} alt="" className="w-11 aspect-2/3 rounded-sm" draggable={false} />
+                                <div className="flex-grow flex flex-col justify-center text-md">
+                                    <div className="font-medium">{item.bookName}</div>
+                                    <div className="font-normal text-md flex overflow-hidden gap-1">
+                                        <div>{`${item.likes} likes`}</div>
+                                        &#x2022;
+                                        <div>{`${item.comments} comments`}</div>
+                                    </div>
+                                    <div className="font-normal opacity-70 text-md flex overflow-hidden gap-1">
+                                        <div>{item.author.username}</div>
+                                        &#x2022;
+                                        <div>{defaultText(item.createdAt)}</div>
+                                    </div>
+                                </div>
+                            </div>)
+                        ))}
+                    </div>
+                </div>
+            </>}
+            {isNotiOpen && 
+            <>
+                <div className="text-2xl w-full font-semibold px-3 py-5">
+                    Notification
+                </div>
+                <div className="w-full flex">
+                    {notificationItems.map((item) => {
+                        const isActive = handleGetActiveNotiItem(item.id);
+                        return (
+                            <div className={"hover:cursor-pointer w-1/3 flex items-center justify-center border-b-[1px] border-black py-3 " + (isActive ? "font-semibold": "opacity-30")} key={item.id} onClick={() => handleClickNotiItem(item.id)}>{item.label}</div>
+                        );
+                    })}
+                </div>
+                <div className="overflow-y-scroll flex flex-col gap-3 py-3">
+                    {notification?.data.map((item => (
+                        <div className="p-3 hover:cursor-pointer hover:bg-slate-100 flex gap-3" onClick={() => handleClickNotification(item)}>
+                            <img src={item.avatar ? baseURL+item.avatar : DefaultAvt} className="w-11 h-11 rounded-full object-cover object-fit" />
+                            <div className="flex flex-col justify-center">
+                                <div className="font-semibold">{item.creatorId.username}</div>
+                                <div>started following you.</div>
+                            </div>
+                        </div>
+                    )))}
+                </div>
+            </>}
+        </motion.div>
+    </div>);
 }
 
 export default SideBar;

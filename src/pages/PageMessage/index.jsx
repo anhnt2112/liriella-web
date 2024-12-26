@@ -8,6 +8,8 @@ import { baseURL, APIsRoutes } from "../../utils/services/ApiService";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import useChatSocket from "../../context/useChatSocket";
+import { chatSocket } from "../../components/layout/AuthLayout";
 
 const PageMessage = () => {
   const { user } = useUser();
@@ -16,13 +18,19 @@ const PageMessage = () => {
   const navigate = useNavigate();
   const conversationId = location.pathname.split("/")[2];
   const [conversationInfo, setConversationInfo] = useState(null);
+  const [content, setContent] = useState("");
+  const { sendMessageToConversation, joinConversation } = useChatSocket();
 
   const scrollToBottom = () => {
     if (chatboxRef.current)
       chatboxRef.current.scrollTop = chatboxRef.current.scrollHeight;
   }
 
-  const { data: conversations, isLoading: isLoadingConversations } = useQuery({
+  useEffect(() => {
+    scrollToBottom();
+  });
+
+  const { data: conversations, isLoading: isLoadingConversations, refetch: reloadConversations } = useQuery({
     queryKey: ['conversationList'],
     queryFn: () => {
       return axios.get(baseURL+APIsRoutes.Conversation.Get.path, { headers: {
@@ -31,7 +39,7 @@ const PageMessage = () => {
     }
   });
 
-  const { data: messages, isLoading: isMessageLoading } = useQuery({
+  const { data: messages, isLoading: isMessageLoading, refetch: reloadMessage } = useQuery({
     queryKey: ['messages', conversationId],
     queryFn: () => {
       const addedPath = `/${conversationId}`;
@@ -40,11 +48,41 @@ const PageMessage = () => {
       }});
     },
     enabled: !!conversationId
-  })
+  });
+
+  const { mutate: sendMessage, isLoading: isSendingMessage } = useMutation({
+    mutationFn: () => {
+      if (!conversationId || !content.length) return;
+      return axios.post(baseURL+APIsRoutes.Message.Post.path, {
+        conversationId,
+        content
+      }, { headers: {
+        'session-id': localStorage.getItem('session-id')
+      }});
+    },
+    onSuccess: () => {
+      setContent("");
+      reloadConversations();
+      reloadMessage();
+      sendMessageToConversation(conversationId);
+    }
+  });
 
   useEffect(() => {
-    scrollToBottom();
+    chatSocket.on('receiveMessage', () => {
+      reloadConversations();
+      reloadMessage();
+    });
+
+    return () => {
+      chatSocket.off('receiveMessage');
+    }
   }, []);
+
+  useEffect(() => {
+    if (!conversationId) return;
+    joinConversation(conversationId);
+  }, [conversationId]);
 
   useEffect(() => {
     if (!conversationId || !conversations) return;
@@ -94,9 +132,27 @@ const PageMessage = () => {
     return <img src={chat.senderAvatar ? baseURL+chat.senderAvatar : DefaultAvatar} alt="" draggable={false} className="w-7 h-7 rounded-full" />;
   }
 
+  const handleSendMessage = () => {
+    sendMessage();
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  }
+
+  const renderLastMessage = (item) => {
+    if (!item.lastMessage) return defaultText(item.createdAt);
+    return <div className="flex gap-1">
+      <div className="w-fit font-medium">{item.lastSender === user?.username ? "You:" : `${item.lastSender}: `}</div>
+      <div className="overflow-hidden flex-grow">{item.lastMessage}</div>
+    </div>;
+  }
+
   return (
     <div className="w-full h-full flex">
-      <div className="w-[400px] h-full border-r-[1px] border-ui-input-stroke flex flex-col">
+      <div className="w-96 h-full border-r-[1px] border-ui-input-stroke flex flex-col">
         <div className="w-full h-fit p-5 flex items-center justify-between shadow">
           <div className="text-xl font-semibold">{user?.username}</div>
           <img src={CreateFilled} alt="" className="w-8 h-8 hover:cursor-pointer" />
@@ -125,7 +181,7 @@ const PageMessage = () => {
                 <img src={baseURL+conversation.avatar} alt="" draggable={false} className="w-12 h-12 rounded-full object-cover object-center" />
                 <div className="flex-grow flex flex-col justify-center">
                   <div className="w-full text-base">{conversation.name}</div>
-                  <div className="w-full text-xs font-light">{conversation.lastMessage ? "Abc" : defaultText(conversation.createdAt)}</div>
+                  <div className="w-full text-xs font-light">{renderLastMessage(conversation)}</div>
                 </div>
               </div>
             ))}
@@ -162,9 +218,9 @@ const PageMessage = () => {
           <div className="p-2 flex items-center gap-2 rounded-full border border-ui-input-stroke">
           <img src={EnterIcon} alt="" className="h-6" />
           <div className="flex-grow h-full flex items-center">
-              <input placeholder="Message..." className="w-full text-sm focus:outline-none" />
+              <input placeholder="Message..." className="w-full text-sm focus:outline-none" value={content} onChange={(e) => setContent(e.target.value)} onKeyDown={handleKeyDown} />
           </div>
-          <div className="text-[#3399ff] text-sm font-semibold hover:cursor-pointer">Send</div>
+          <div className="text-[#3399ff] text-sm font-semibold hover:cursor-pointer" onClick={handleSendMessage}>Send</div>
         </div>
         </div>
       </div>

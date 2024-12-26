@@ -1,24 +1,22 @@
-import { useEffect } from "react";
-import socketService from "../utils/services/socketService";
+import { useEffect, useState } from 'react';
+import { baseURL } from '../utils/services/ApiService';
+import { chatSocket } from '../components/layout/AuthLayout';
 
-export const useChatSocket = (conversationId) => {
-  useEffect(() => {
-    const socket = socketService.connect("chat");
+const useChatSocket = () => {
 
-    socket.emit("joinConversation", conversationId);
+  const sendMessageToConversation = (conversationId) => {
+    chatSocket.emit('sendMessage', conversationId);
+  };
 
-    socket.on("receiveMessage", (message) => {
-      console.log("New message received:", message);
-    });
+  const joinConversation = (conversationId) => {
+    chatSocket.emit('joinConversation', conversationId);
+  };
 
-    return () => {
-      socket.emit("leaveConversation", conversationId);
-      socketService.disconnect();
-    };
-  }, [conversationId]);
+  const leaveConversation = (conversationId) => {
+    chatSocket.emit('leaveConversation', conversationId);
+  };
+
+  return { sendMessageToConversation, joinConversation, leaveConversation };
 };
 
-export const sendMessage = (conversationId, senderId, content) => {
-  const socket = socketService.getSocket();
-  socket.emit("sendMessage", { conversationId, senderId, content });
-};
+export default useChatSocket;

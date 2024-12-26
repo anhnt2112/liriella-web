@@ -19,13 +19,13 @@ const UnauthForm = () => {
 
     const { mutate, isLoading, isError } = useMutation({
         mutationFn: () => {
-            // return callApi(baseURL, content.button.action.path, content.button.action.method, formData);
             return axios.post(baseURL+content.button.action.path, formData);
         },
         onSuccess: (response) => {
-            content.button.callback(response);
-            if (!content.button.callback.path) navigate(0);
-            else navigate(`/${content.button.callback.path}`);
+            if (content.button.callback)
+                content.button.callback(response);
+            if (!content.button.path) navigate(0);
+            else navigate(`${content.button.path}`);
         }
     });
 

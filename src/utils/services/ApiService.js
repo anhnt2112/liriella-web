@@ -25,10 +25,22 @@ export const APIsRoutes = {
             path: "/post/create",
         },
         GetProfile: {
-            path: "/post/get-posts-by-username"
+            path: "/post/get-posts-by-user-id"
         },
         Preview: {
             path: "/post/preview"
+        },
+        GetByPostId: {
+            path: "/post/get-post-by-id"
+        },
+        Following: {
+            path: "/post/following"
+        },
+        Explore: {
+            path: "/post/explore"
+        },
+        Search: {
+            path: "/post/search"
         }
     },
     User: {
@@ -37,6 +49,9 @@ export const APIsRoutes = {
         },
         ProfileByUsername: {
             path: "/user/profile-by-username"
+        },
+        ProfileByUserID: {
+            path: "/user/profile-by-user-id"
         },
         FollowUser: {
             path: "/user/follow"
@@ -52,6 +67,9 @@ export const APIsRoutes = {
         },
         RemoveAvatar: {
             path: "/user/remove-avatar"
+        },
+        Search: {
+            path: "/user/search"
         }
     },
     Conversation: {
@@ -68,6 +86,25 @@ export const APIsRoutes = {
         },
         Post: {
             path: "/messages"
+        }
+    },
+    Comment: {
+        Like: {
+            path: '/comment/like',
+        },
+        Comment: {
+            path: '/comment/comment',
+        },
+        Unlike: {
+            path: '/comment/unlike',
+        },
+        HasLikedPost: {
+            path: '/comment/hasLikedPost'
+        }
+    },
+    Notification: {
+        Get: {
+            path: '/notification'
         }
     }
 }

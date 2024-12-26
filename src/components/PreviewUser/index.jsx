@@ -12,8 +12,8 @@ const PreviewUser = () => {
   const { data: previewProfile, isLoading: isProfileLoading } = useQuery({
     queryKey: ['profileInfo', previewUserSetting],
     queryFn: async () => {
-      const addedPath = `/${previewUserSetting.username}`;
-      return axios.get(baseURL+APIsRoutes.User.ProfileByUsername.path+addedPath);
+      const addedPath = `/${previewUserSetting.userID}`;
+      return axios.get(baseURL+APIsRoutes.User.ProfileByUserID.path+addedPath);
     },
     enabled: !!previewUserSetting
   });
@@ -21,7 +21,7 @@ const PreviewUser = () => {
   const { data: previewPosts, isLoading: isPostLoading } = useQuery({
     queryKey: ['previewPosts', previewUserSetting],
     queryFn: async () => {
-      const addedPath = `/${previewUserSetting.username}`;
+      const addedPath = `/${previewUserSetting.userID}`;
       return axios.get(baseURL+APIsRoutes.Post.Preview.path+addedPath);
     }
   });

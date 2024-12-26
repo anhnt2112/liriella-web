@@ -5,7 +5,7 @@ const ModalContext = createContext();
 export const ModalProvider = ({ children }) => {
   const [isCreatePost, setIsCreatePost] = useState(false);
   const [detailPostId, setDetailPostId] = useState(null);
-  const [relationUsername, setRelationUsername] = useState(null);
+  const [relationID, setRelationID] = useState(null);
   const [inFollowers, setInFollowersMode] = useState(true);
   const [onChangeAvatar, setOnChangeAvatar] = useState(false);
   const [previewUserSetting, setPreviewUserSetting] = useState(null);
@@ -17,8 +17,8 @@ export const ModalProvider = ({ children }) => {
   const openDetailPost = (id) => setDetailPostId(id);
   const closeDetailPost = () => setDetailPostId(null);
 
-  const openRelationModal = (username) => setRelationUsername(username);
-  const closeRelationModal = () => setRelationUsername(null);
+  const openRelationModal = (userID) => setRelationID(userID);
+  const closeRelationModal = () => setRelationID(null);
 
   const setInFollowing = () => setInFollowersMode(false);
   const setInFollowers = () => setInFollowersMode(true);
@@ -26,8 +26,8 @@ export const ModalProvider = ({ children }) => {
   const openChangeAvatar = () => setOnChangeAvatar(true);
   const closeChangeAvatar = () => setOnChangeAvatar(false);
 
-  const openPreviewUser = (username, position) => {
-    setPreviewUserSetting({ username, position });
+  const openPreviewUser = (userID, position) => {
+    setPreviewUserSetting({ userID, position });
   }
 
   const closePreviewUser = () => {
@@ -41,7 +41,7 @@ export const ModalProvider = ({ children }) => {
       // detail post 
       detailPostId, openDetailPost, closeDetailPost, 
       // relation modal
-      relationUsername, openRelationModal, closeRelationModal, 
+      relationID, openRelationModal, closeRelationModal, 
       // connections
       inFollowers, setInFollowing, setInFollowers,
       // change avatar

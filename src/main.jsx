@@ -9,11 +9,9 @@ import { ModalProvider } from './context/useModal'
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ModalProvider>
-        <RouterProvider router={router} />
-      </ModalProvider>
-    </QueryClientProvider>
-  </StrictMode>,
+  <QueryClientProvider client={queryClient}>
+    <ModalProvider>
+      <RouterProvider router={router} />
+    </ModalProvider>
+  </QueryClientProvider>,
 )

@@ -20,7 +20,7 @@ const PageProfile = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useUser();
-  const username = (location.pathname.split("/")[2] ?? user?.username) ?? "";
+  const username = (location.pathname.split("/")[2] ?? user?.username) ?? ""; 
   const { openRelationModal, setInFollowing, setInFollowers, openChangeAvatar } = useModal();
 
   const { data: profile, isLoading: isProfileLoading, refetch } = useQuery({
@@ -35,22 +35,22 @@ const PageProfile = () => {
   });
 
   const { data, isLoading: isLoadingPost} = useQuery({
-    queryKey: ['profilePosts', username, inFavorite],
+    queryKey: ['profilePosts', profile?.data._id, inFavorite],
     queryFn: async () => {
-      const addedPath = `/${username}?isFavorite=${inFavorite}`;
+      const addedPath = `/${profile?.data._id}?isFavorite=${inFavorite}`;
       return axios.get(baseURL+APIsRoutes.Post.GetProfile.path+addedPath, { headers: {
         'session-id': localStorage.getItem('session-id')
       }});
     },
-    enabled: !!username
+    enabled: !!profile
   });
 
   const { mutate, isLoading: isLoadingMutate } = useMutation({
     mutationFn: () => {
       if (!user || !profile.data) return;
       if (user?.username === username) return;
-      const isFollowing = profile.data.followers.includes(user.username);
-      const addedPath = `/${username}`;
+      const isFollowing = profile.data.followers.includes(user._id);
+      const addedPath = `/${profile.data._id}`;
       return axios.post(baseURL+(isFollowing ? APIsRoutes.User.UnFollowUser.path : APIsRoutes.User.FollowUser.path)+addedPath, null, { headers: {
         'session-id': localStorage.getItem('session-id')
       }});
@@ -91,12 +91,12 @@ const PageProfile = () => {
   }
 
   const handleOpenFollowers = () => {
-    openRelationModal(username);
+    openRelationModal(profile?.data._id);
     setInFollowers(true);
   }
 
   const handleOpenFollowing = () => {
-    openRelationModal(username);
+    openRelationModal(profile?.data._id);
     setInFollowing(true);
   }
 
@@ -124,7 +124,7 @@ const PageProfile = () => {
             <div className="w-full flex items-center gap-4">
               <div className="text-xl">{profile.data.username}</div>
               <div className="bg-[#0095F6] px-4 py-1 text-white rounded-xl hover:cursor-pointer hover:bg-[#3F00FF] font-medium" onClick={handleClick}>
-                {user.username === username ? "Edit profile" : !profile.data.followers.includes(user.username) ? "Follow" : "Unfollow"}
+                {user.username === username ? "Edit profile" : !profile.data.followers.includes(user._id) ? "Follow" : "Unfollow"}
               </div>
               <div className="bg-[#EFEFEF] px-4 py-1 rounded-xl font-medium hover:cursor-pointer hover:bg-[#d7d7d7]" onClick={handleMessage}>
                 {user.username === username ? "Setting" : "Message"}
@@ -168,7 +168,7 @@ const PageProfile = () => {
           }, []).map((postGr, ind) => (
             <div className="w-full h-fit flex" key={ind}>
               {postGr.map((post, index) => (
-                <div className="w-1/4 aspect-2/3 p-3" key={index}>
+                <div className="w-1/4 aspect-2/3 p-1" key={index}>
                   <PostPreview post={post} />
                 </div>
               ))}

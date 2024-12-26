@@ -1,4 +1,6 @@
 import AuthLayout from "../components/layout/AuthLayout";
+import PageExplore from "../pages/PageExplore";
+import PageHome from "../pages/PageHome";
 import PageMessage from "../pages/PageMessage";
 import PageProfile from "../pages/PageProfile";
 import { ProtectedAuth } from "./protected";
@@ -14,11 +16,11 @@ const authRoutes = [
         children: [
             {
                 path: "home",
-                element: <div>aaa</div>
+                element: <PageHome />
             },
             {
                 path: "explore",
-                elment: <div>aaa</div>
+                element: <PageExplore />
             },
             {
                 path: "message",

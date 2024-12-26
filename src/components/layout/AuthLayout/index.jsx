@@ -6,15 +6,22 @@ import PostDetail from "../../PostDetail";
 import RelationModal from "../../RelationModal";
 import UpdateAvatarModal from "../../UpdateAvatarModal";
 import PreviewUser from "../../PreviewUser";
+import { baseURL } from "../../../utils/services/ApiService";
+import { io } from 'socket.io-client';
+
+export const chatSocket = io(`${baseURL}/chat`);
+export const notificationSocket = io(`${baseURL}/notification`, {
+    transports: ["websocket"],
+    reconnection: true
+});
 
 const AuthLayout = () => {
 
     return (<>
         <div className="w-screen h-screen flex">
-            <div className="hidden md:inline md:w-14 xl:w-60">
+            <div className="hidden md:inline md:w-fit">
                 <SideBar />
             </div>
-            <div className="w-[1px] h-full bg-ui-input-stroke" />
             <div className="flex-grow">
                 <Outlet />
             </div>

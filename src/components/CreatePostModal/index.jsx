@@ -5,6 +5,8 @@ import { motion } from "motion/react";
 import { useModal } from "../../context/useModal";
 import { baseURL, APIsRoutes } from "../../utils/services/ApiService";
 import { useMutation } from "@tanstack/react-query";
+import useUser from "../../context/useUser";
+import DefaultAvatar from "../../assets/jpg/default_avt.jpg";
 import axios from "axios";
 
 const CreatePostModal = () => {
@@ -15,6 +17,7 @@ const CreatePostModal = () => {
   const [step, setStep] = useState(0);
   const [showDiscardPost, setShowDiscardPost] = useState(false);
   const createPostRef = useRef(null);
+  const { user } = useUser();
 
   const { mutate } = useMutation({
     mutationFn: () => {
@@ -111,8 +114,8 @@ const CreatePostModal = () => {
         </div>
         
         <div className="flex-grow rounded-b-xl flex">
-          <div className={"flex flex-col items-center justify-center gap-2 w-[420px]"}>
-            {imagePreview ? <img src={imagePreview} alt="Preview" className={step === 2 ? "rounded-bl-xl" : "rounded-b-xl"} /> : <>
+          <div className={"flex flex-col items-center justify-center gap-2 w-[420px] aspect-2/3"}>
+            {imagePreview ? <img src={imagePreview} alt="Preview" className={"w-full h-full object-cover object-fit " + (step === 2 ? "rounded-bl-xl" : "rounded-b-xl")} /> : <>
               <img src={Book} alt="Upload book cover here" />
               <p className="text-xl font-medium">Upload book cover here</p>
               <input type="file" id="createPostBookCoverSelect" accept="image/*" className="hidden" onChange={handleFileChange} />
@@ -122,8 +125,8 @@ const CreatePostModal = () => {
           </div>
           {step === 2 && <div className="w-[420px] rounded-br-xl p-5 flex flex-col gap-5">
             <div className="w-full flex items-center gap-3">
-              <img className="w-10 rounded-full" src="https://imgs.search.brave.com/DzYUMuG6uVmYZmZQgrATGPCHt8EYwZUw5lH9TKjuVFo/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9kMzhi/MDQ0cGV2bndjOS5j/bG91ZGZyb250Lm5l/dC9jdXRvdXQtbnV4/dC9jYXJ0b29uL25l/dy8xMy5qcGc" />
-              <div className="flex-grow font-medium text-base">7u4n_4nh</div>
+              <img className="w-10 h-10 rounded-full" src={user?.avatar ? baseURL+user?.avatar : DefaultAvatar} />
+              <div className="flex-grow font-medium text-base">{user?.username}</div>
             </div>
             <textarea maxLength={2024} className="h-1/2 p-1 text-sm focus:outline-none" placeholder="Description" value={content?.description} onChange={(e) => setContent({...content, description: e.target.value})} />
             <input className="p-1 text-sm focus:outline-none" placeholder="Book's name" value={content?.bookName} onChange={(e) => setContent({...content, bookName: e.target.value})} />
