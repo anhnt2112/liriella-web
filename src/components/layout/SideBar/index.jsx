@@ -28,10 +28,6 @@ import MenuFilled from "../../../assets/svg/menu_filled.svg";
 import DefaultAvatar from "../../../assets/png/avatar.png";
 import DefaultAvatarFilled from "../../../assets/png/avatar_filled.png";
 
-import SettingIcon from "../../../assets/png/setting.png";
-import ActivityIcon from "../../../assets/png/activities.png";
-import LogoutIcon from "../../../assets/png/logout.png";
-
 import BookIcon from "../../../assets/png/book.png";
 import DefaultAvt from "../../../assets/jpg/default_avt.jpg";
 
@@ -48,17 +44,15 @@ const SideBar = () => {
     const { currentBreakpoint } = useTailwindBreakpoint();
     const navigate = useNavigate();
     const location = useLocation();
-    const { openCreatePost, isCreatePost, openDetailPost } = useModal();
+    const { openCreatePost, isCreatePost, openDetailPost, isMoreOpen, setIsMoreOpen } = useModal();
     const { user } = useUser();
     const { registerUser } = useNotificationSocket();
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(currentBreakpoint === 'md' || currentBreakpoint === 'lg');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isNotiOpen, setIsNotiOpen] = useState(false);
-    const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [onSearchByUsername, setOnSearchByUsername] = useState(true);
     const [searchContent, setSearchContent] = useState("");
     const sidebarRef = useRef(null);
-    const moreModalRef = useRef(null);
     const [notiState, setNotiState] = useState({
         isPost: false,
         isComment: false
@@ -176,9 +170,6 @@ const SideBar = () => {
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (moreModalRef.current && !moreModalRef.current.contains(event.target)) {
-                setIsMoreOpen(false);
-            }
             if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
                 setIsNotiOpen(false);
                 setIsSearchOpen(false);
@@ -335,29 +326,6 @@ const SideBar = () => {
                     More
                 </motion.div>
             </motion.div>
-
-            {/* More modal */}
-            {isMoreOpen && <div 
-                className="absolute left-5 bottom-16 bg-white z-40 h-fit w-fit p-2 rounded-lg flex flex-col gap-2"
-                style={{
-                    boxShadow: "0 0 4px rgba(0, 0, 0, 0.3)"
-                }}
-                ref={moreModalRef}
-            >
-                <div className="px-2 h-10 w-48 flex items-center rounded-lg hover:bg-slate-100 hover:cursor-pointer gap-3">
-                    <img src={SettingIcon} alt="setting" className="w-6" />
-                    <div className="flex-grow text-sm">Setting</div>
-                </div>
-                <div className="px-2 h-10 w-48 flex items-center rounded-lg hover:bg-slate-100 hover:cursor-pointer gap-3">
-                    <img src={ActivityIcon} alt="setting" className="w-6 p-0.5" />
-                    <div className="flex-grow w-full text-sm">Your Activities</div>
-                </div>
-                <div className="w-full h-[1px] bg-slate-100" />
-                <div className="px-2 h-10 w-48 flex items-center rounded-lg hover:bg-slate-100 hover:cursor-pointer gap-3">
-                    <img src={LogoutIcon} alt="setting" className="w-6 p-0.5" />
-                    <div className="flex-grow w-full text-sm">Log Out</div>
-                </div>
-            </div>}
         </motion.div>
         <motion.div
             className="h-full rounded-r-2xl border-r-[1px] border-ui-input-stroke overflow-hidden flex flex-col absolute top-0 left-full z-20 bg-white"

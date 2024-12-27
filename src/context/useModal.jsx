@@ -9,6 +9,7 @@ export const ModalProvider = ({ children }) => {
   const [inFollowers, setInFollowersMode] = useState(true);
   const [onChangeAvatar, setOnChangeAvatar] = useState(false);
   const [previewUserSetting, setPreviewUserSetting] = useState(null);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
   const previewUserRef = useRef(null);
 
   const openCreatePost = () => setIsCreatePost(true);
@@ -48,6 +49,8 @@ export const ModalProvider = ({ children }) => {
       onChangeAvatar, openChangeAvatar, closeChangeAvatar,
       // preview user
       previewUserRef, previewUserSetting, openPreviewUser, closePreviewUser,
+      // more modal
+      isMoreOpen, setIsMoreOpen
     }}>
       {children}
     </ModalContext.Provider>
