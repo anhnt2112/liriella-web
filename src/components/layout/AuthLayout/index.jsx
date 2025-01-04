@@ -9,6 +9,8 @@ import PreviewUser from "../../PreviewUser";
 import { baseURL } from "../../../utils/services/ApiService";
 import { io } from 'socket.io-client';
 import MoreModal from "../../MoreModal";
+import NoteModal from "../../NoteModal";
+import NoteCarousel from "../../Carousel/NoteCarousel";
 
 export const chatSocket = io(`${baseURL}/chat`);
 export const notificationSocket = io(`${baseURL}/notification`, {
@@ -33,6 +35,8 @@ const AuthLayout = () => {
         <UpdateAvatarModal />
         <PreviewUser />
         <MoreModal />
+        <NoteModal />
+        <NoteCarousel />
     </>);
 }
 

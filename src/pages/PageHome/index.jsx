@@ -16,12 +16,26 @@ import { useModal } from "../../context/useModal";
 import DivIntersection from "../../components/DivIntersection";
 import useUser from "../../context/useUser";
 import useTailwindBreakpoint from "../../context/useTailwindBreakpoint";
+import useEmblaCarousel from "embla-carousel-react";
+import {
+    PrevButton,
+    NextButton,
+    usePrevNextButtons
+  } from '../../components/Carousel/ArrowButton';
 
 const PageHome = () => {
-    const { openDetailPost } = useModal();
+    const { openDetailPost, openNoteCarousel } = useModal();
     const { user } = useUser();
     const [postState, setPostState] = useState({});
     const { isLargeScreen } = useTailwindBreakpoint();
+    const [emblaRef, emblaApi] = useEmblaCarousel();
+
+    const {
+        prevBtnDisabled,
+        nextBtnDisabled,
+        onPrevButtonClick,
+        onNextButtonClick
+      } = usePrevNextButtons(emblaApi);
 
     const { data: followingPosts, isLoading, refetch } = useQuery({
         queryKey: ['followingPosts'],
@@ -38,6 +52,26 @@ const PageHome = () => {
             return axios.get(baseURL+APIsRoutes.User.Explore.path,  { headers: {
                 'session-id': localStorage.getItem('session-id')
             }});
+        }
+    });
+
+    const { data: notesResponse, refetch: refetchNotes } = useQuery({
+        queryKey: ['notes'],
+        queryFn: () => {
+            return axios.get(baseURL+APIsRoutes.Post.GetNotes.path, { headers: {
+                'session-id': localStorage.getItem('session-id')
+            }});
+        }
+    });
+
+    const { mutate } = useMutation({
+        mutationFn: (id) => {
+            return axios.post(baseURL+APIsRoutes.User.FollowUser+`/${id}`, null, { headers: {
+                'session-id': localStorage.getItem('session-id')
+            }});
+        },
+        onSuccess: () => {
+            refetchSuggessted();
         }
     });
 
@@ -106,12 +140,26 @@ const PageHome = () => {
         return `${formattedDate}`;
     }
 
+    const handleLogout = () => {
+        localStorage.removeItem("session-id");
+        window.location.reload();
+    }
+
     return (
         <div className="flex justify-center gap-32">
             <div className="max-w-[630px] w-full flex h-screen overflow-y-scroll flex-col items-center">
-                <div className="w-full py-8 flex gap-4">
-                    <div className="w-16 h-16 rounded-full bg-red-400 hover:cursor-pointer"></div>
-                    <div className="w-16 h-16 rounded-full bg-red-400"></div>
+                <div className="w-full py-8 overflow-hidden relative select-none" ref={emblaRef}>
+                    <div className="flex gap-4 touch-pan-y touch-pinch-zoom">
+                        {(notesResponse?.data ?? []).map(note => (<>
+                            <div className="w-16 h-16 rounded-full flex-none flex items-center justify-center hover:cursor-pointer" style={{
+                                background: "linear-gradient(270deg, #BA1313 0%, #BABA00 100%)"
+                            }} onClick={openNoteCarousel}>
+                                <img src={note.user.avatar ? baseURL+note.user.avatar : DefaultAvatar} className="w-[60px] h-[60px] border-white border-[2px] rounded-full object-cover object-fit" draggable={false} />
+                            </div>
+                        </>))}
+                    </div>
+                    {/* <PrevButton className="w-6 h-6 absolute left-2 top-[52px]" onClick={onPrevButtonClick} disabled={prevBtnDisabled} /> */}
+                    {/* <NextButton className="w-6 h-6 absolute right-2 top-[52px]" onClick={onNextButtonClick} disabled={nextBtnDisabled} /> */}
                 </div>
                 <div className="max-w-[470px] w-full flex flex-col gap-3 pb-5">
                     {followingPosts?.data.posts.map((post, index) => (
@@ -163,17 +211,17 @@ const PageHome = () => {
                         <div className="font-semibold">{user?.username}</div>
                         <div className="font-light">{user?.fullName}</div>
                     </div>
-                    <button className="text-ui-blue font-semibold">Log out</button>
+                    <button className="text-ui-blue font-semibold" onClick={handleLogout}>Log out</button>
                 </div>
                 <div className="font-semibold opacity-50">Suggested for you</div>
                 {(suggested?.data.explore ?? []).map(item => (
-                    <div className="flex items-center gap-3 w-80">
+                    <div className="flex items-center gap-3 w-80" key={item._id}>
                         <img src={item?.avatar ? baseURL+item?.avatar : DefaultAvatar} className="w-14 h-14 rounded-full object-cover object-fit" />
                         <div className="flex flex-col flex-grow">
                             <div className="font-semibold">{item?.username}</div>
                             <div className="font-light">{item?.fullName}</div>
                         </div>
-                        <button className="text-ui-blue font-semibold">Follow</button>
+                        <button className="text-ui-blue font-semibold" onClick={() => mutate(item._id)}>Follow</button>
                     </div>
                 ))}
             </div>}

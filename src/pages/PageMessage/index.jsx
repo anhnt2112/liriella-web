@@ -10,6 +10,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import useChatSocket from "../../context/useChatSocket";
 import { chatSocket } from "../../components/layout/AuthLayout";
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from 'embla-carousel-autoplay';
+import { NextButton, PrevButton, usePrevNextButtons } from "../../components/Carousel/ArrowButton";
 
 const PageMessage = () => {
   const { user } = useUser();
@@ -20,6 +23,9 @@ const PageMessage = () => {
   const [conversationInfo, setConversationInfo] = useState(null);
   const [content, setContent] = useState("");
   const { sendMessageToConversation, joinConversation } = useChatSocket();
+  const [emblaRef, emblaApi] = useEmblaCarousel({}, [
+    Autoplay({ delay: 5000 })
+  ]);
 
   const scrollToBottom = () => {
     if (chatboxRef.current)
@@ -34,6 +40,15 @@ const PageMessage = () => {
     queryKey: ['conversationList'],
     queryFn: () => {
       return axios.get(baseURL+APIsRoutes.Conversation.Get.path, { headers: {
+        'session-id': localStorage.getItem('session-id')
+      }});
+    }
+  });
+
+  const { data: notesResponse, refetch: refetchNotes } = useQuery({
+    queryKey: ['notes'],
+    queryFn: () => {
+      return axios.get(baseURL+APIsRoutes.Post.GetNotes.path, { headers: {
         'session-id': localStorage.getItem('session-id')
       }});
     }
@@ -150,6 +165,13 @@ const PageMessage = () => {
     </div>;
   }
 
+  const {
+    prevBtnDisabled,
+    nextBtnDisabled,
+    onPrevButtonClick,
+    onNextButtonClick
+  } = usePrevNextButtons(emblaApi);
+
   return (
     <div className="w-full h-full flex">
       <div className="w-96 h-full border-r-[1px] border-ui-input-stroke flex flex-col">
@@ -157,17 +179,15 @@ const PageMessage = () => {
           <div className="text-xl font-semibold">{user?.username}</div>
           <img src={CreateFilled} alt="" className="w-8 h-8 hover:cursor-pointer" />
         </div>
-        <div className="flex-grow flex flex-col overflow-y-auto">
+        <div className="flex-grow flex flex-col overflow-y-auto relative">
           {/* Avatar and name */}
-          <div className="w-full h-fit py-5 px-4 flex gap-3">
-            <div className="relative flex justify-center pt-8 w-24">
-              <img src={DefaultAvatar} className="rounded-full w-16 h-16" draggable={false} />
-              <NoteBox className="top-0 left-0 max-w-full h-12 text-[10px]" note = "Aaa cannot live without coffee!" />
-            </div>
-
-            <div className="relative flex justify-center pt-8 w-24">
-              <img src={DefaultAvatar} className="rounded-full w-16 h-16" draggable={false} />
-              <NoteBox className="top-0 left-0 max-w-full h-12 text-[10px]" />
+          <div className="overflow-hidden w-full select-none" ref={emblaRef}>
+            <div className="w-full h-fit py-5 px-4 flex gap-3 touch-pan-y touch-pinch-zoom">
+              {(notesResponse?.data ?? []).map(note => (
+              <div className="relative flex justify-center pt-8 w-24">
+                <img src={note.user.avatar ? baseURL+note.user.avatar : DefaultAvatar} className="rounded-full w-16 h-16" draggable={false} />
+                <NoteBox className="top-0 left-0 max-w-full h-12 text-[10px]" note={note.content}/>
+              </div>))}
             </div>
           </div>
           {/* Conversation */}

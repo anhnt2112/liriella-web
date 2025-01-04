@@ -10,6 +10,8 @@ export const ModalProvider = ({ children }) => {
   const [onChangeAvatar, setOnChangeAvatar] = useState(false);
   const [previewUserSetting, setPreviewUserSetting] = useState(null);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [isCreateNoteOpen, setIsCreateNoteOpen] = useState(false);
+  const [showNoteCarousel, setShowNoteCarousel] = useState(false);
   const previewUserRef = useRef(null);
 
   const openCreatePost = () => setIsCreatePost(true);
@@ -26,6 +28,12 @@ export const ModalProvider = ({ children }) => {
 
   const openChangeAvatar = () => setOnChangeAvatar(true);
   const closeChangeAvatar = () => setOnChangeAvatar(false);
+
+  const openCreateNote = () => setIsCreateNoteOpen(true);
+  const closeCreateNote = () => setIsCreateNoteOpen(false);
+
+  const openNoteCarousel = () => setShowNoteCarousel(true);
+  const closeNoteCarousel = () => setShowNoteCarousel(false);
 
   const openPreviewUser = (userID, position) => {
     setPreviewUserSetting({ userID, position });
@@ -50,7 +58,11 @@ export const ModalProvider = ({ children }) => {
       // preview user
       previewUserRef, previewUserSetting, openPreviewUser, closePreviewUser,
       // more modal
-      isMoreOpen, setIsMoreOpen
+      isMoreOpen, setIsMoreOpen,
+      // create note
+      isCreateNoteOpen, openCreateNote, closeCreateNote,
+      // show note carousel
+      showNoteCarousel, openNoteCarousel, closeNoteCarousel,
     }}>
       {children}
     </ModalContext.Provider>

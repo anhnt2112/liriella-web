@@ -41,6 +41,15 @@ export const APIsRoutes = {
         },
         Search: {
             path: "/post/search"
+        },
+        CreateNote: {
+            path: '/post/note'
+        },
+        GetNote: {
+            path: '/post/note',
+        },
+        GetNotes: {
+            path: '/post/notes'
         }
     },
     User: {

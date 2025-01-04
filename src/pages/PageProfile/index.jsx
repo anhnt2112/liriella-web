@@ -21,7 +21,7 @@ const PageProfile = () => {
   const navigate = useNavigate();
   const { user } = useUser();
   const username = (location.pathname.split("/")[2] ?? user?.username) ?? ""; 
-  const { openRelationModal, setInFollowing, setInFollowers, openChangeAvatar } = useModal();
+  const { openRelationModal, setInFollowing, setInFollowers, openChangeAvatar, openCreateNote } = useModal();
 
   const { data: profile, isLoading: isProfileLoading, refetch } = useQuery({
     queryKey: ['profileInfo', username],
@@ -33,6 +33,14 @@ const PageProfile = () => {
     },
     enabled: !!username
   });
+
+  const { data: response, isLoading, refetch: refetchNote } = useQuery({
+    queryKey: ['note', profile?.data._id],
+    queryFn: () => {
+        return axios.get(baseURL+APIsRoutes.Post.GetNote.path+`/${profile?.data._id}`);
+    },
+    enabled: !! profile?.data._id
+});
 
   const { data, isLoading: isLoadingPost} = useQuery({
     queryKey: ['profilePosts', profile?.data._id, inFavorite],
@@ -107,7 +115,7 @@ const PageProfile = () => {
   }
 
   const handleChangeNote = () => {
-    console.log("Change note");
+    if (user?.username === username) openCreateNote();
   }
 
   return (
@@ -115,18 +123,18 @@ const PageProfile = () => {
       <div className="w-full max-w-[1024px]">
         {/* Profile */}
         {isProfileLoading ? <div>Loading...</div> : profile?.data ? 
-        <div className="w-full px-20 py-10 flex items-center md:gap-10 lg:gap-20">
+        <div className="w-full px-20 py-10 flex items-center gap-5 md:gap-10 lg:gap-20">
           <div className="relative flex justify-center pt-6">
-            <img src={profile?.data.avatar ? baseURL + profile?.data.avatar : DefaultAvatar} className="rounded-full w-40 h-40 hover:cursor-pointer object-cover object-center" draggable={false} onClick={handleChangeAvatar} />
-            <NoteBox className="top-0 left-0 max-w-full text-xs h-12" note = "Aaa cannot live without coffee!" onClick={handleChangeNote} />
+            <img src={profile?.data.avatar ? baseURL + profile?.data.avatar : DefaultAvatar} className="rounded-full w-20 h-20 md:w-40 md:h-40 hover:cursor-pointer object-cover object-center" draggable={false} onClick={handleChangeAvatar} />
+            <NoteBox className="top-0 left-0 max-w-full text-xs h-12" note={response?.data[0]?.content ?? null} onClick={handleChangeNote} />
           </div>
-          <div className="flex-grow h-full flex flex-col gap-3">
+          <div className="flex-grow h-full flex flex-col gap-1 md:gap-3">
             <div className="w-full flex items-center gap-4">
               <div className="text-xl">{profile.data.username}</div>
-              <div className="bg-[#0095F6] px-4 py-1 text-white rounded-xl hover:cursor-pointer hover:bg-[#3F00FF] font-medium" onClick={handleClick}>
+              <div className="bg-[#0095F6] px-3.5 py-1 text-white rounded-xl hover:cursor-pointer hover:bg-[#3F00FF] font-medium" onClick={handleClick}>
                 {user.username === username ? "Edit profile" : !profile.data.followers.includes(user._id) ? "Follow" : "Unfollow"}
               </div>
-              <div className="bg-[#EFEFEF] px-4 py-1 rounded-xl font-medium hover:cursor-pointer hover:bg-[#d7d7d7]" onClick={handleMessage}>
+              <div className="bg-[#EFEFEF] px-3.5 py-1 rounded-xl font-medium hover:cursor-pointer hover:bg-[#d7d7d7]" onClick={handleMessage}>
                 {user.username === username ? "Setting" : "Message"}
               </div>
             </div>
