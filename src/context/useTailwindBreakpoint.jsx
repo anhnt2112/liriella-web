@@ -11,6 +11,7 @@ const breakpoints = {
 
 const useTailwindBreakpoint = () => {
     const [currentBreakpoint, setCurrentBreakpoint] = useState("");
+    const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth > 1536);
 
     useEffect(() => {
         const checkBreakpoint = () => {
@@ -21,6 +22,7 @@ const useTailwindBreakpoint = () => {
             else if (window.innerWidth >= breakpoints.md) setCurrentBreakpoint("md");
             else if (window.innerWidth >= breakpoints.sm) setCurrentBreakpoint("sm");
             else setCurrentBreakpoint("none");
+            setIsLargeScreen(window.innerWidth > 1536);
         }
 
         checkBreakpoint();
@@ -31,7 +33,8 @@ const useTailwindBreakpoint = () => {
     }, []);
 
     return {
-        currentBreakpoint
+        currentBreakpoint,
+        isLargeScreen
     }
 }
 

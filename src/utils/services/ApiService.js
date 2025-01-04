@@ -70,6 +70,9 @@ export const APIsRoutes = {
         },
         Search: {
             path: "/user/search"
+        },
+        Explore: {
+            path: "/user/explore"
         }
     },
     Conversation: {

@@ -15,16 +15,27 @@ import CartHoverIcon from "../../assets/png/cart_hover.png";
 import { useModal } from "../../context/useModal";
 import DivIntersection from "../../components/DivIntersection";
 import useUser from "../../context/useUser";
+import useTailwindBreakpoint from "../../context/useTailwindBreakpoint";
 
 const PageHome = () => {
     const { openDetailPost } = useModal();
     const { user } = useUser();
     const [postState, setPostState] = useState({});
+    const { isLargeScreen } = useTailwindBreakpoint();
 
     const { data: followingPosts, isLoading, refetch } = useQuery({
         queryKey: ['followingPosts'],
         queryFn: () => {
             return axios.get(baseURL+APIsRoutes.Post.Following.path,  { headers: {
+                'session-id': localStorage.getItem('session-id')
+            }});
+        }
+    });
+
+    const { data: suggested, refetch: refetchSuggessted } = useQuery({
+        queryKey: ['suggested'],
+        queryFn: () => {
+            return axios.get(baseURL+APIsRoutes.User.Explore.path,  { headers: {
                 'session-id': localStorage.getItem('session-id')
             }});
         }
@@ -96,7 +107,7 @@ const PageHome = () => {
     }
 
     return (
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-32">
             <div className="max-w-[630px] w-full flex h-screen overflow-y-scroll flex-col items-center">
                 <div className="w-full py-8 flex gap-4">
                     <div className="w-16 h-16 rounded-full bg-red-400 hover:cursor-pointer"></div>
@@ -145,6 +156,27 @@ const PageHome = () => {
                     </DivIntersection>))}
                 </div>
             </div>
+            {isLargeScreen && <div className="flex flex-col py-9 gap-3">
+                <div className="flex items-center gap-3 w-80">
+                    <img src={user?.avatar ? baseURL+user?.avatar : DefaultAvatar} className="w-14 h-14 rounded-full object-cover object-fit" />
+                    <div className="flex flex-col flex-grow">
+                        <div className="font-semibold">{user?.username}</div>
+                        <div className="font-light">{user?.fullName}</div>
+                    </div>
+                    <button className="text-ui-blue font-semibold">Log out</button>
+                </div>
+                <div className="font-semibold opacity-50">Suggested for you</div>
+                {(suggested?.data.explore ?? []).map(item => (
+                    <div className="flex items-center gap-3 w-80">
+                        <img src={item?.avatar ? baseURL+item?.avatar : DefaultAvatar} className="w-14 h-14 rounded-full object-cover object-fit" />
+                        <div className="flex flex-col flex-grow">
+                            <div className="font-semibold">{item?.username}</div>
+                            <div className="font-light">{item?.fullName}</div>
+                        </div>
+                        <button className="text-ui-blue font-semibold">Follow</button>
+                    </div>
+                ))}
+            </div>}
         </div>
     );
 }
