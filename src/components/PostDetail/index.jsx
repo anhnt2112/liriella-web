@@ -22,6 +22,8 @@ const PostDetail = () => {
     const modalRef = useRef(null);
     const { user } = useUser();
     const [content, setContent] = useState("");
+    const [replyComment, setReplyComment] = useState(null);
+    const [expands, setExpands] = useState({});
 
     const { data: post, isLoading: isPostLoading, refetch: refetchPost } = useQuery({
         queryKey: ["postDetail", detailPostId],
@@ -30,15 +32,6 @@ const PostDetail = () => {
             return axios.get(baseURL+APIsRoutes.Post.GetByPostId.path+addedPath);
         },
         enabled: !!detailPostId
-    });
-
-    const { data: likeState, refetch: refetchLikeState } = useQuery({
-        queryKey: ["likeState", user?.username, detailPostId],
-        queryFn: () => {
-            const addedPath = `?postId=${detailPostId}&username=${user?.username}`;
-            return axios.get(baseURL+APIsRoutes.Comment.HasLikedPost.path+addedPath);
-        },
-        enabled: !!detailPostId && !!user
     });
 
     const { data: comments, refetch: refetchComments } = useQuery({
@@ -52,10 +45,16 @@ const PostDetail = () => {
 
     const { mutate: commentPost } = useMutation({
         mutationFn: () => {
-            return axios.post(baseURL+APIsRoutes.Comment.Comment.path, { 
+            const formData = { 
                 postId: detailPostId,
                 content
-            }, { headers: {
+            };
+
+            if (replyComment) {
+                formData.commentId = replyComment;
+            }
+                
+            return axios.post(baseURL+APIsRoutes.Comment.Comment.path, formData, { headers: {
                 'session-id': localStorage.getItem('session-id')
             }});
         },
@@ -67,34 +66,47 @@ const PostDetail = () => {
     });
 
     const { mutate: likePost } = useMutation({
-        mutationFn: () => {
-            return axios.post(baseURL+APIsRoutes.Comment.Like.path, { 
+        mutationFn: (commentId) => {
+            const formData = {
                 postId: detailPostId
-            }, { headers: {
+            };
+
+            if (commentId) formData.commentId = commentId;
+
+            return axios.post(baseURL+APIsRoutes.Comment.Like.path, formData, { headers: {
                 'session-id': localStorage.getItem('session-id')
             }});
         },
         onSuccess: () => {
-            refetchLikeState();
             refetchPost();
         },
         enabled: !!detailPostId
     });
 
     const { mutate: unlikePost } = useMutation({
-        mutationFn: () => {
-            return axios.post(baseURL+APIsRoutes.Comment.Unlike.path, { 
+        mutationFn: (commentId) => {
+            const formData = {
                 postId: detailPostId
-            }, { headers: {
+            };
+
+            if (commentId) formData.commentId = commentId;
+
+            return axios.post(baseURL+APIsRoutes.Comment.Unlike.path, formData, { headers: {
                 'session-id': localStorage.getItem('session-id')
             }});
         },
         onSuccess: () => {
-            refetchLikeState();
             refetchPost();
         },
         enabled: !!detailPostId
     });
+
+    const checkLike = (commentId) => {
+        if (!comments?.data.all) return false;
+        return comments?.data.all.filter((comment) => !comment.content && comment.author._id === user?._id && comment.comment?._id === commentId).length > 0;
+    }
+    // Check like post: content = null, author._id = user._id, comment = null
+    // Check like comment: content = null, author._id = user._id, comment._id = commentId
 
     const handleFocus = () => {
         if (inputRef.current) {
@@ -103,7 +115,7 @@ const PostDetail = () => {
     }
 
     const handleClickLike = () => {
-        if (!likeState?.data.hasLiked) likePost();
+        if (checkLike(null)) likePost();
         else unlikePost();
     }
 
@@ -122,6 +134,7 @@ const PostDetail = () => {
     useEffect(() => {
         const handleClickOutside = (event) => {
           if (modalRef.current && !modalRef.current.contains(event.target)) {
+            setReplyComment(null);
             closeDetailPost();
           }
         }
@@ -145,6 +158,24 @@ const PostDetail = () => {
         return `${formattedDate}`;
     }
 
+    const countReply = (commentId) => {
+        if (!comments?.data.all) return 0;
+        return comments?.data.all.filter((comment) => comment.comment?._id === commentId && !!comment.comment.content);
+    }
+
+    const countLike = (commentId) => {
+        if (!comments?.data.all) return 0;
+        return comments?.data.all.filter((comment) => comment.comment?._id === commentId && !comment.comment.content);
+    }
+
+    const handleLikeComment = (commentId) => {
+        console.log(commentId);
+        if (!checkLike(commentId)) likePost(commentId);
+        else unlikePost(commentId);
+    }
+
+    console.log(comments);
+
     return (<>
         {detailPostId && <div className="w-screen h-screen z-40 bg-black bg-opacity-50 fixed top-0 left-0 flex items-center justify-center select-none">
             <div className="bg-white w-[750px] lg:w-[1000px] h-[66vh] lg:h-[88vh] overflow-hidden rounded-md flex" ref={modalRef}>
@@ -164,29 +195,54 @@ const PostDetail = () => {
                             </div>
                             <div className="w-full pl-12 flex flex-col">
                                 <div className="flex">
-                                    <div className="italic underline font-medium">Book's name:</div>
+                                    <div className="italic underline font-medium">Book&apos;s name:</div>
                                     &nbsp;
                                     <div className="font-semibold flex-grow ">{post?.data.bookName}</div></div>
                                 <div>{post?.data.description}</div>
                             </div>
                         </div>
-                        {comments?.data.all.map((comment, index) => (
+                        {comments?.data.all.filter(item => !item.comment).map((comment, index) => (
                             <div key={index} className="flex gap-3">
                                 <img src={comment?.author.avatar ? baseURL+comment?.author.avatar : DefaultAvatar} alt="" className="w-9 h-9 rounded-full object-cover object-center" />
                                 <div className="flex-grow flex flex-col">
                                     <div className="flex justify-between items-center">
                                         <div className="font-medium text-lg">{comment?.author.username}</div>
-                                        <MultipleStateIcon defaultIcon={LikeIcon} hoverIcon={LikeHoverIcon} activeIcon={LikeFilledIcon} className="hover:cursor-pointer h-4" />
+                                        <MultipleStateIcon defaultIcon={LikeIcon} hoverIcon={LikeHoverIcon} activeIcon={LikeFilledIcon} className="hover:cursor-pointer h-4" isActive={checkLike(comment._id)} onClick={() => handleLikeComment(comment._id)} />
                                     </div>
                                     <div>{comment?.content}</div>
-                                    <div className="font-light text-xs">{defaultText(comment?.createdAt)}</div>
+                                    <div className="text-xs flex gap-3">
+                                        <div className="font-normal">{defaultText(comment?.createdAt)}</div>
+                                        <div className="font-medium hover:cursor-pointer">{countLike(comment._id).length} likes</div>
+                                        <div className="font-medium hover:cursor-pointer" onClick={() => setReplyComment(comment)}>Reply</div>
+                                    </div>
+                                    {countReply(comment._id).length > 0 && <div className={"mt-3 flex items-center gap-2 " + (expands[comment._id] ? "mb-3" : "")}>
+                                        <div className="w-6 h-[1px] bg-slate-400" />
+                                        <div className="text-xs font-medium hover:cursor-pointer" onClick={() => setExpands({...expands, [comment._id]: !expands[comment._id]})}>
+                                            {expands[comment._id] ? "Hide replies" : `View ${countReply(comment._id).length} replies`}
+                                        </div>
+                                    </div>}
+                                    {expands[comment._id] && countReply(comment._id).map((reply, index) => (
+                                        <div key={index} className="flex gap-3">
+                                        <img src={reply?.author.avatar ? baseURL+reply?.author.avatar : DefaultAvatar} alt="" className="w-9 h-9 rounded-full object-cover object-center" />
+                                        <div className="flex-grow flex flex-col">
+                                            <div className="flex justify-between items-center">
+                                                <div className="font-medium text-lg">{reply?.author.username}</div>
+                                                <MultipleStateIcon defaultIcon={LikeIcon} hoverIcon={LikeHoverIcon} activeIcon={LikeFilledIcon} className="hover:cursor-pointer h-4" isActive={checkLike(reply._id)} onClick={() => handleLikeComment(reply._id)} />
+                                            </div>
+                                            <div>{reply?.content}</div>
+                                            <div className="text-xs flex gap-3">
+                                                <div className="font-normal">{defaultText(reply?.createdAt)}</div>
+                                                <div className="font-medium hover:cursor-pointer">{countReply(reply._id).length} likes</div>
+                                            </div>
+                                        </div>
+                                    </div>))}
                                 </div>
                             </div>
                         ))}
                     </div>
                     <div className="w-full p-3 border-t-2 border-slate-200 flex flex-col gap-2">
                         <div className="w-full flex gap-2">
-                            <MultipleStateIcon defaultIcon={LikeIcon} hoverIcon={LikeHoverIcon} activeIcon={LikeFilledIcon} isActive={likeState?.data.hasLiked} className="hover:cursor-pointer w-7" onClick={handleClickLike} />
+                            <MultipleStateIcon defaultIcon={LikeIcon} hoverIcon={LikeHoverIcon} activeIcon={LikeFilledIcon} isActive={checkLike(null)} className="hover:cursor-pointer w-7" onClick={handleClickLike} />
                             <MultipleStateIcon defaultIcon={CommentIcon} hoverIcon={CommentFilledIcon} className="hover:cursor-pointer w-7" onClick={handleFocus} />
                             {post?.data.author.username === user?.username &&
                             <div className="flex-grow flex justify-end">
@@ -198,12 +254,15 @@ const PostDetail = () => {
                             <div className="font-light text-xs">{defaultText(post?.data.createdAt)}</div>
                         </div>
                     </div>
-                    <div className="w-full p-3 border-t-2 border-slate-300 flex items-center gap-3">
-                        <img src={EnterIcon} alt="" className="h-9" />
-                        <div className="flex-grow">
-                            <input placeholder="Add a comment" className="w-full focus:outline-none" ref={inputRef} onKeyDown={handleKeyDown} value={content} onChange={(e) => setContent(e.target.value)} />
+                    <div className="w-full p-3 border-t-2 border-slate-300 flex flex-col">
+                        {replyComment && <div className="text-sm font-semibold hover:cursor-pointer" onClick={() => setReplyComment(null)}>Reply to{' '}@{replyComment.author.username}</div>}
+                        <div className="w-full flex items-center gap-3">
+                            <img src={EnterIcon} alt="" className="h-9" />
+                            <div className="flex-grow">
+                                <input placeholder="Add a comment" className="w-full focus:outline-none" ref={inputRef} onKeyDown={handleKeyDown} value={content} onChange={(e) => setContent(e.target.value)} />
+                            </div>
+                            <div className="text-ui-blue font-semibold hover:cursor-pointer" onClick={handleComment}>Post</div>
                         </div>
-                        <div className="text-ui-blue font-semibold hover:cursor-pointer" onClick={handleComment}>Post</div>
                     </div>
                 </div>
             </div>
