@@ -22,16 +22,18 @@ const UnauthForm = () => {
             return axios.post(baseURL+content.button.action.path, formData);
         },
         onSuccess: (response) => {
-            if (content.button.callback)
-                content.button.callback(response);
-            if (!content.button.path) navigate(0);
-            else navigate(`${content.button.path}`);
+            if (content.button.callback) content.button.callback(response);
+            if (!response.data.isRecovery) navigate("/information");else navigate(0);
         }
     });
 
     const handleClick = (item) => {
         if (item.action) item.action();
-        navigate(`/${item.path}`);
+        if (item.path) navigate(`/${item.path}`);
+        if (item.href) {
+            const newLink = baseURL + item.href;
+            window.location.href = newLink;
+        }
     }
 
     const handleChangeField = (field, value) => {
@@ -80,7 +82,7 @@ const UnauthForm = () => {
                         <div className="text-center text-sm" key={index}>{text}</div>
                     ))}
                 </div>
-            </>}
+                </>}
                 {content.button && <button className="my-3 md:my-4 bg-ui-blue text-white font-semibold p-1 rounded-lg" onClick={handleSubmit}>{content.button.text}</button>}
             </div>
             {content.extra && <>

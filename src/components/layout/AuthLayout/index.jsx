@@ -11,6 +11,9 @@ import { io } from 'socket.io-client';
 import MoreModal from "../../MoreModal";
 import NoteModal from "../../NoteModal";
 import NoteCarousel from "../../Carousel/NoteCarousel";
+import UpdateProfileModal from "../../UpdatePofileModal";
+import { ToastContainer } from "react-toastify";
+import UpdateSettingModal from "../../UpdateSettingModal";
 
 export const chatSocket = io(`${baseURL}/chat`);
 export const notificationSocket = io(`${baseURL}/notification`, {
@@ -37,6 +40,9 @@ const AuthLayout = () => {
         <MoreModal />
         <NoteModal />
         <NoteCarousel />
+        <UpdateProfileModal />
+        <UpdateSettingModal />
+        <ToastContainer />
     </>);
 }
 

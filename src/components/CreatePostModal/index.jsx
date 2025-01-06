@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import useUser from "../../context/useUser";
 import DefaultAvatar from "../../assets/jpg/default_avt.jpg";
 import axios from "axios";
+import YesNoCheckBox from "../CheckBox/YesNo";
 
 const CreatePostModal = () => {
   const { isCreatePost, closeCreatePost } = useModal();
@@ -133,7 +134,7 @@ const CreatePostModal = () => {
             <input className="p-1 text-sm focus:outline-none" placeholder="Link to buy" value={content?.linkToBuy} onChange={(e) => setContent({...content, linkToBuy: e.target.value})} />
             <div className="w-full flex items-center justify-between p-1">
               <div className="text-base">Mark as Favorite</div>
-              <motion.div 
+              {/* <motion.div 
                 className="w-14 h-8 p-1 rounded-full cursor-pointer"
                 initial={{ backgroundColor: !content?.isFavorite ? "#DBDFE4" : "#F05408" }}
                 animate={{ backgroundColor: !content?.isFavorite ? "#DBDFE4" : "#F05408" }}
@@ -146,7 +147,8 @@ const CreatePostModal = () => {
                   animate={{ x: !content?.isFavorite ? 0 : "100%" }}
                   transition={{ ease: "easeOut", type: "spring", damping: 15, stiffness: 120 }}
                 />
-              </motion.div>
+              </motion.div> */}
+              <YesNoCheckBox value={content?.isFavorite} onClick={() => setContent({...content, isFavorite: !content?.isFavorite})} />
             </div>
           </div>}
         </div>

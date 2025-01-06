@@ -38,12 +38,12 @@ export const unauthFormStates = {
                 {
                     label: "Log in with Facebook",
                     icon: FacebookLogo,
-                    path: ""
+                    href: "/auth/facebook"
                 },
                 {
                     label: "Log in with Google",
                     icon: GoogleLogo,
-                    path: ""
+                    href: "/auth/google"
                 },
                 {
                     label: "Forgot password",
@@ -84,7 +84,7 @@ export const unauthFormStates = {
             button: {
                 text: "Sign up",
                 action: APIsRoutes.Auth.Register,
-                path: "log-in",
+                callback: (response) => localStorage.setItem("session-id", response.data.sessionId),
             },
             explainText: [
                 "People who use our service may have uploaded your contact infomation to Libriella.",

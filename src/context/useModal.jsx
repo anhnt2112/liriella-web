@@ -12,6 +12,8 @@ export const ModalProvider = ({ children }) => {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isCreateNoteOpen, setIsCreateNoteOpen] = useState(false);
   const [showNoteCarousel, setShowNoteCarousel] = useState(false);
+  const [isUpdateInfo, setIsUpdateInfo] = useState(false);
+  const [isUpdateSetting, setIsUpdateSetting] = useState(false);
   const previewUserRef = useRef(null);
 
   const openCreatePost = () => setIsCreatePost(true);
@@ -34,6 +36,12 @@ export const ModalProvider = ({ children }) => {
 
   const openNoteCarousel = () => setShowNoteCarousel(true);
   const closeNoteCarousel = () => setShowNoteCarousel(false);
+
+  const openUpdateInfo = () => setIsUpdateInfo(true);
+  const closeUpdateInfo = () => setIsUpdateInfo(false);
+
+  const openUpdateSetting = () => setIsUpdateSetting(true);
+  const closeUpdateSetting = () => setIsUpdateSetting(false);
 
   const openPreviewUser = (userID, position) => {
     setPreviewUserSetting({ userID, position });
@@ -63,6 +71,10 @@ export const ModalProvider = ({ children }) => {
       isCreateNoteOpen, openCreateNote, closeCreateNote,
       // show note carousel
       showNoteCarousel, openNoteCarousel, closeNoteCarousel,
+      // update info
+      isUpdateInfo, openUpdateInfo, closeUpdateInfo,
+      // update setting
+      isUpdateSetting, openUpdateSetting, closeUpdateSetting
     }}>
       {children}
     </ModalContext.Provider>

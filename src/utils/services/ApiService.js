@@ -82,6 +82,9 @@ export const APIsRoutes = {
         },
         Explore: {
             path: "/user/explore"
+        },
+        UpdateUser: {
+            path: "/user/profile"
         }
     },
     Conversation: {

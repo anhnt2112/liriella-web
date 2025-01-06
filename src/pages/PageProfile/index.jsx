@@ -21,7 +21,7 @@ const PageProfile = () => {
   const navigate = useNavigate();
   const { user } = useUser();
   const username = (location.pathname.split("/")[2] ?? user?.username) ?? ""; 
-  const { openRelationModal, setInFollowing, setInFollowers, openChangeAvatar, openCreateNote } = useModal();
+  const { openRelationModal, setInFollowing, setInFollowers, openChangeAvatar, openCreateNote, openUpdateInfo, openUpdateSetting } = useModal();
 
   const { data: profile, isLoading: isProfileLoading, refetch } = useQuery({
     queryKey: ['profileInfo', username],
@@ -84,7 +84,7 @@ const PageProfile = () => {
   const handleClick = () => {
     // if (!user) return;
     if (user?.username === username) {
-      console.log("Edit profile");
+      openUpdateInfo();
     } else {
       mutate();
     }
@@ -92,7 +92,7 @@ const PageProfile = () => {
 
   const handleMessage = () => {
     if (user?.username === username) {
-      console.log("Go to setting");
+      openUpdateSetting();
     } else {
       goToConversation();
     }

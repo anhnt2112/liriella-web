@@ -6,7 +6,7 @@ import LogoutIcon from "../../assets/png/logout.png";
 import { useModal } from "../../context/useModal";
 
 const MoreModal = () => {
-  const { isMoreOpen, setIsMoreOpen } = useModal();
+  const { isMoreOpen, setIsMoreOpen, openUpdateSetting } = useModal();
   const moreModalRef = useRef(null);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const MoreModal = () => {
     ref={moreModalRef}>
       <div className="px-2 h-10 w-48 flex items-center rounded-lg hover:bg-slate-100 hover:cursor-pointer gap-3">
         <img src={SettingIcon} alt="setting" className="w-6" />
-        <div className="flex-grow text-sm">Setting</div>
+        <div className="flex-grow text-sm" onClick={openUpdateSetting}>Setting</div>
       </div>
       <div className="px-2 h-10 w-48 flex items-center rounded-lg hover:bg-slate-100 hover:cursor-pointer gap-3">
         <img src={ActivityIcon} alt="setting" className="w-6 p-0.5" />
