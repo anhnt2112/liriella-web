@@ -85,6 +85,9 @@ export const APIsRoutes = {
         },
         UpdateUser: {
             path: "/user/profile"
+        },
+        UpdateSetting: {
+            path: "/user/setting"
         }
     },
     Conversation: {

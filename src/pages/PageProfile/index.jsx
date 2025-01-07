@@ -159,12 +159,12 @@ const PageProfile = () => {
         )}
         {/* Post */}
         <div className="w-full border-t-[1px] border-slate-200 flex justify-center gap-2">
-          <div className={"w-32 p-2 flex items-center justify-center gap-2 cursor-pointer rounded-b-sm active:text-slate-500 " + (!inFavorite ? "border-t-[1px] border-black" : "")} onClick={() => setInFavorite(false)}>
-            <img src={inFavorite ? Grid : GridFilled} alt="grid" className="h-6 p-1" />
+          <div className={"w-32 p-2 flex items-center justify-center gap-2 cursor-pointer rounded-b-sm active:text-slate-500 " + (!inFavorite ? "border-t-[1px] border-black" : "opacity-50")} onClick={() => setInFavorite(false)}>
+            <img src={Grid} alt="grid" className="h-6 p-1" />
             <div className={!inFavorite ? "font-semibold" : ""}>POSTS</div>
           </div>
-          <div className={"w-32 p-2 flex items-center justify-center gap-2 cursor-pointer rounded-b-sm active:text-slate-500 " + (inFavorite ? "border-t-[1px] border-black" : "")} onClick={() => setInFavorite(true)}>
-            <img src={inFavorite ? HeartFilled : Heart} alt="heart" className="h-6" />
+          <div className={"w-32 p-2 flex items-center justify-center gap-2 cursor-pointer rounded-b-sm active:text-slate-500 " + (inFavorite ? "border-t-[1px] border-black" : "opacity-50")} onClick={() => setInFavorite(true)}>
+            <img src={Heart} alt="heart" className="h-6" />
             <div className={inFavorite ? "font-semibold" : ""}>FAVORITE</div>
           </div>
         </div>

@@ -15,6 +15,8 @@ import HeartFilledIcon from "../../assets/png/heart_filled.png";
 import HeartHoverIcon from "../../assets/png/heart_hover.png";
 import MultipleStateIcon from "../MultipleStateIcon";
 import useUser from "../../context/useUser";
+import DeleteIcon from "../../assets/png/trash.png";
+import CreateIcon from "../../assets/png/create.png";
 
 const PostDetail = () => {
     const { detailPostId, closeDetailPost } = useModal();
@@ -189,6 +191,10 @@ const PostDetail = () => {
                     <div className="w-full p-3 border-b-2 border-slate-200 flex gap-3 items-center">
                         <img src={post?.data.author.avatar ? baseURL+post?.data.author.avatar : DefaultAvatar} alt="" className="w-9 h-9 rounded-full object-cover object-center" />
                         <div className="font-medium text-lg h-fit flex-grow">{post?.data.author.username}</div>
+                        {post?.data?.author._id === user?._id && <div className="flex gap-1">
+                            <img src={CreateIcon} className="w-5 h-5 hover:cursor-pointer" />
+                            <img src={DeleteIcon} className="w-5 h-5 hover:cursor-pointer" />
+                        </div>}
                     </div>
                     <div className="w-full p-3 flex flex-col gap-3 flex-grow overflow-y-scroll">
                         <div className="w-full flex flex-col items-center">
