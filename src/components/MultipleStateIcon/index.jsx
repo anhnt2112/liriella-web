@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const MultipleStateIcon = ({ className = "", defaultIcon, hoverIcon, activeIcon, isActive = false, onClick }) => {
     const [icon, setIcon] = useState(defaultIcon);

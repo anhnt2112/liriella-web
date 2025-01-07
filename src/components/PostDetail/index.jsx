@@ -78,6 +78,7 @@ const PostDetail = () => {
             }});
         },
         onSuccess: () => {
+            refetchComments();
             refetchPost();
         },
         enabled: !!detailPostId
@@ -96,6 +97,7 @@ const PostDetail = () => {
             }});
         },
         onSuccess: () => {
+            refetchComments();
             refetchPost();
         },
         enabled: !!detailPostId
@@ -103,10 +105,11 @@ const PostDetail = () => {
 
     const checkLike = (commentId) => {
         if (!comments?.data.all) return false;
-        return comments?.data.all.filter((comment) => !comment.content && comment.author._id === user?._id && comment.comment?._id === commentId).length > 0;
+        return comments?.data.all.filter((comment) => {
+            const firstCondition = !comment.content && comment.author._id === user?._id;
+            return firstCondition && comment.comment === commentId;
+        }).length > 0;
     }
-    // Check like post: content = null, author._id = user._id, comment = null
-    // Check like comment: content = null, author._id = user._id, comment._id = commentId
 
     const handleFocus = () => {
         if (inputRef.current) {
@@ -115,7 +118,7 @@ const PostDetail = () => {
     }
 
     const handleClickLike = () => {
-        if (checkLike(null)) likePost();
+        if (!checkLike(null)) likePost();
         else unlikePost();
     }
 
@@ -160,12 +163,12 @@ const PostDetail = () => {
 
     const countReply = (commentId) => {
         if (!comments?.data.all) return 0;
-        return comments?.data.all.filter((comment) => comment.comment?._id === commentId && !!comment.comment.content);
+        return comments?.data.all.filter((comment) => comment.comment?._id === commentId && !!comment.content);
     }
 
     const countLike = (commentId) => {
         if (!comments?.data.all) return 0;
-        return comments?.data.all.filter((comment) => comment.comment?._id === commentId && !comment.comment.content);
+        return comments?.data.all.filter((comment) => comment.comment === commentId && !comment.content);
     }
 
     const handleLikeComment = (commentId) => {
@@ -201,7 +204,7 @@ const PostDetail = () => {
                                 <div>{post?.data.description}</div>
                             </div>
                         </div>
-                        {comments?.data.all.filter(item => !item.comment).map((comment, index) => (
+                        {comments?.data.all.filter(item => !!item.content && !item.comment).map((comment, index) => (
                             <div key={index} className="flex gap-3">
                                 <img src={comment?.author.avatar ? baseURL+comment?.author.avatar : DefaultAvatar} alt="" className="w-9 h-9 rounded-full object-cover object-center" />
                                 <div className="flex-grow flex flex-col">
@@ -232,7 +235,7 @@ const PostDetail = () => {
                                             <div>{reply?.content}</div>
                                             <div className="text-xs flex gap-3">
                                                 <div className="font-normal">{defaultText(reply?.createdAt)}</div>
-                                                <div className="font-medium hover:cursor-pointer">{countReply(reply._id).length} likes</div>
+                                                <div className="font-medium hover:cursor-pointer">{countLike(reply._id).length} likes</div>
                                             </div>
                                         </div>
                                     </div>))}
