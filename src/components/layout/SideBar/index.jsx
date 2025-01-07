@@ -440,7 +440,7 @@ const SideBar = () => {
                                         <img src={baseURL+item.postId.image} className="w-11 aspect-2/3 rounded-sm object-cover object-fit" />
                                         <div className="flex flex-col justify-center">
                                             <div className="font-semibold">@{item.creatorId.username}</div>
-                                            <div>{item.commentId?.content ? "Commented on " : "Reacted to "}your post.</div>
+                                            <div>{item.commentId?.content ? "Reply " : "Reacted "}to your post.</div>
                                             <div className="flex gap-1"><div className="font-light italic">{item.commentId?.content}</div>&bull;<div>{defaultText(item.createdAt)}</div></div>
                                         </div>
                                     </div>
