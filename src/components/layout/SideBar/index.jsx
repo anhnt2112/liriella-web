@@ -260,6 +260,18 @@ const SideBar = () => {
         openDetailPost(postId);
     }
 
+    console.log(notification?.data.filter(noti => {
+        if (!notiState.isPost) {
+            return !noti.postId;
+        } else {
+            if (notiState.isComment) {
+                return noti.postId && noti.commentId;
+            } else {
+                return noti.postId && !noti.commentId;
+            }
+        }
+    }));
+
     return (<div className="w-fit h-full flex relative" ref={sidebarRef}>
         <motion.div 
             className="h-full p-2 flex flex-col select-none relative border-r-[1px] border-ui-input-stroke overflow-hidden"
@@ -400,15 +412,53 @@ const SideBar = () => {
                     })}
                 </div>
                 <div className="overflow-y-scroll flex flex-col gap-3 py-3">
-                    {notification?.data.map((item => (
-                        <div className="p-3 hover:cursor-pointer hover:bg-slate-100 flex gap-3" onClick={() => handleClickNotification(item)}>
-                            <img src={item.avatar ? baseURL+item.avatar : DefaultAvt} className="w-11 h-11 rounded-full object-cover object-fit" />
-                            <div className="flex flex-col justify-center">
-                                <div className="font-semibold">{item.creatorId.username}</div>
-                                <div>started following you.</div>
-                            </div>
-                        </div>
-                    )))}
+                    {notification?.data.filter(noti => {
+                        if (!notiState.isPost) {
+                            return !noti.postId;
+                        } else {
+                            if (notiState.isComment) {
+                                return noti.postId && !!noti.commentId?.comment;
+                            } else {
+                                return noti.postId && !noti.commentId?.comment;
+                            }
+                        }
+                    }).map((item => {
+                        if (!notiState.isPost) {
+                            return (
+                                <div className="p-3 hover:cursor-pointer hover:bg-slate-100 flex gap-3" onClick={() => handleClickNotification(item)}>
+                                    <img src={item.creatorId.avatar ? baseURL+item.creatorId.avatar : DefaultAvt} className="w-11 h-11 rounded-full object-cover object-fit" />
+                                    <div className="flex flex-col justify-center">
+                                        <div className="font-semibold">@{item.creatorId.username}</div>
+                                        <div>started following you.</div>
+                                    </div>
+                                </div>
+                            );
+                        } else {
+                            if (notiState.isComment) {
+                                return (
+                                    <div className="p-3 hover:cursor-pointer hover:bg-slate-100 flex gap-3" onClick={() => handleClickNotification(item)}>
+                                        <img src={baseURL+item.postId.image} className="w-11 aspect-2/3 rounded-sm object-cover object-fit" />
+                                        <div className="flex flex-col justify-center">
+                                            <div className="font-semibold">@{item.creatorId.username}</div>
+                                            <div>{item.commentId?.content ? "Commented on " : "Reacted to "}your post.</div>
+                                            <div className="flex gap-1"><div className="font-light italic">{item.commentId?.content}</div>&bull;<div>{defaultText(item.createdAt)}</div></div>
+                                        </div>
+                                    </div>
+                                );
+                            } else {
+                                return (
+                                    <div className="p-3 hover:cursor-pointer hover:bg-slate-100 flex gap-3" onClick={() => handleClickNotification(item)}>
+                                        <img src={baseURL+item.postId.image} className="w-11 aspect-2/3 rounded-sm object-cover object-fit" />
+                                        <div className="flex flex-col justify-center">
+                                            <div className="font-semibold">@{item.creatorId.username}</div>
+                                            <div>{item.commentId?.content ? "Commented on " : "Reacted to "}your post.</div>
+                                            <div className="flex gap-1"><div className="font-light italic">{item.commentId?.content}</div>&bull;<div>{defaultText(item.createdAt)}</div></div>
+                                        </div>
+                                    </div>
+                                );
+                            }
+                        }
+                    }))}
                 </div>
             </>}
         </motion.div>
