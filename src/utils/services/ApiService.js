@@ -124,5 +124,10 @@ export const APIsRoutes = {
         Get: {
             path: '/notification'
         }
+    },
+    Activity: {
+        Get: {
+            path: '/activity'
+        }
     }
 }

@@ -1,4 +1,5 @@
 import AuthLayout from "../components/layout/AuthLayout";
+import PageActivity from "../pages/PageActivity";
 import PageExplore from "../pages/PageExplore";
 import PageHome from "../pages/PageHome";
 import PageMessage from "../pages/PageMessage";
@@ -37,6 +38,10 @@ const authRoutes = [
             {
                 path: "profile/:username",
                 element: <PageProfile />
+            },
+            {
+                path: "activity",
+                element: <PageActivity />
             }
         ]
     }
