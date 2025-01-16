@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import ColorLogo from "../../assets/png/color-logo.png";
 import { unauthFormStates } from "../../utils/unauth";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { AuthStateEnum } from "../../utils/unauth";
 import Input from "../Input";
 import { useMutation } from "@tanstack/react-query";
-import { baseURL } from "../../utils/services/ApiService";
+import { APIsRoutes, baseURL } from "../../utils/services/ApiService";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const UnauthForm = () => {
     const location = useLocation();
@@ -14,6 +15,9 @@ const UnauthForm = () => {
     const authState = path.split('/').filter(Boolean).pop();
     const content = unauthFormStates[authState].form;
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const username = searchParams.get('username');
+    const sessionId = searchParams.get('sessionId');
 
     const [formData, setFormData] = useState({});
 
@@ -27,9 +31,41 @@ const UnauthForm = () => {
         }
     });
 
+    const { mutate: resetPassword } = useMutation({
+        mutationFn: () => {
+            return axios.post(baseURL + APIsRoutes.Auth.ResetPassword.path, {username});
+        },
+        onSuccess: () => {
+            toast.done("Send mail successfully!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+            });
+        },
+        onError: (error) => {
+            toast.error(error.response.data.error, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+            });
+        }
+    });
+
     const handleClick = (item) => {
+        if (item.path === "use-google-account") {
+            resetPassword();
+            return;
+        }
         if (item.action) item.action();
-        if (item.path) navigate(`/${item.path}`);
+        if (item.path) navigate(`/${item.path}?username=${username}`);
         if (item.href) {
             const newLink = baseURL + item.href;
             window.location.href = newLink;
@@ -56,13 +92,80 @@ const UnauthForm = () => {
         </>;
     }
 
+    const { mutate: forgotPassword } = useMutation({
+        mutationFn: (code) => {
+            return axios.post(baseURL + APIsRoutes.Auth.ForgotPassword.path, {
+                username,
+                code
+            });
+        },
+        onSuccess: (response) => {
+            navigate(`/new-password?sessionId=${response?.data.sessionId}`);
+        }
+    });
+
+    const { mutate: updatePassword } = useMutation({
+        mutationFn: (newPassword) => {
+            return axios.post(baseURL+APIsRoutes.User.UpdateUser.path, {
+                password: newPassword
+            }, {
+                headers: {
+                'session-id': sessionId
+            }});
+        },
+        onSuccess: () => {
+            localStorage.setItem("session-id", sessionId);
+            navigate("/home");
+        }
+    })
+
     const handleSubmit = () => {
         if (authState === AuthStateEnum.ForgotPassword) {
-            navigate(`/${AuthStateEnum.ForgotPasswordOptions}`);
+            navigate(`/${AuthStateEnum.ForgotPasswordOptions}?username=${formData.username}`);
         } else if (authState === AuthStateEnum.AnswerQuestion) {
-            navigate(`/${AuthStateEnum.NewPassword}`);
+            forgotPassword(formData.code);
+        } else if (authState === AuthStateEnum.NewPassword) {
+            const errorMessages = [];
+            if (!formData?.password || formData.password?.length < 8) errorMessages.push("Password must be at least 8 characters");
+            if (formData.password !== formData.confirm) errorMessages.push("Confirm password does not match");
+            if (errorMessages.length) {
+                errorMessages.map(err => {
+                    toast.error(err, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: false,
+                    progress: undefined,
+                    });
+                });
+            } else updatePassword(formData.password);
         } else {
-            mutate();
+            // check username password
+            const errorMessages = [];
+
+            if (!formData.username?.length) errorMessages.push("Username is required");
+            if (formData.password?.length < 8) errorMessages.push("Password must be at least 8 characters");
+
+            if (authState === AuthStateEnum.SignUp) {
+                if (formData.password !== formData.confirm) errorMessages.push("Confirm password does not match");
+                if (!formData.fullName?.length) errorMessages.push("Fullname is required");
+            }
+
+            if (errorMessages.length) {
+                errorMessages.map(err => {
+                    toast.error(err, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: false,
+                    progress: undefined,
+                    });
+                });
+            } else mutate();
         }
     }
 

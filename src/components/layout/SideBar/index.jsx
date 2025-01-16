@@ -47,7 +47,7 @@ const SideBar = () => {
     const { openCreatePost, isCreatePost, openDetailPost, isMoreOpen, setIsMoreOpen } = useModal();
     const { user } = useUser();
     const { registerUser } = useNotificationSocket();
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(currentBreakpoint === 'md' || currentBreakpoint === 'lg');
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(window.innerWidth > 767 && window.innerWidth < 1025);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isNotiOpen, setIsNotiOpen] = useState(false);
     const [onSearchByUsername, setOnSearchByUsername] = useState(true);

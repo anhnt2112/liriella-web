@@ -147,6 +147,7 @@ export const unauthFormStates = {
                 {
                     label: "Your answer",
                     type: "text",
+                    id: "code",
                 }
             ],
             button: {
@@ -182,10 +183,12 @@ export const unauthFormStates = {
         form: {
             field: [
                 {
+                    id: "password",
                     label: "New password",
                     type: "password",
                 },
                 {
+                    id: "confirm",
                     label: "Confirm",
                     type: "password",
                 }

@@ -9,6 +9,7 @@ import useUser from "../../context/useUser";
 import DefaultAvatar from "../../assets/jpg/default_avt.jpg";
 import axios from "axios";
 import YesNoCheckBox from "../CheckBox/YesNo";
+import { toast } from "react-toastify";
 
 const CreatePostModal = () => {
   const { isCreatePost, closeCreatePost } = useModal();
@@ -19,6 +20,20 @@ const CreatePostModal = () => {
   const [showDiscardPost, setShowDiscardPost] = useState(false);
   const createPostRef = useRef(null);
   const { user } = useUser();
+
+  const logError = (error) => {
+    error.map(err => {
+      toast.error(err, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        progress: undefined,
+      });
+    });
+  }
 
   const { mutate } = useMutation({
     mutationFn: () => {
@@ -88,7 +103,15 @@ const CreatePostModal = () => {
       isFavorite: false
     });
     if (step === 2) {
-      mutate();
+      const errorMessages = [];
+      if (!content.description?.length) errorMessages.push("You need to fill in the book description");
+      if (!content.bookName?.length) errorMessages.push("You need to fill in the book name");
+
+      if (errorMessages.length) {
+        console.log("FILL");
+        logError(errorMessages);
+        return;
+      } else mutate();
     } else setStep(step + 1);
   }
 

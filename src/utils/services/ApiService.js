@@ -18,6 +18,12 @@ export const APIsRoutes = {
         },
         Config: {
             path: "/auth/config",
+        },
+        ForgotPassword: {
+            path: "/auth/forgot-password"
+        },
+        ResetPassword: {
+            path: "/auth/reset-password"
         }
     },
     Post: {

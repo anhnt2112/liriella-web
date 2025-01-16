@@ -9,6 +9,7 @@ import { APIsRoutes, baseURL } from "../../utils/services/ApiService";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { queryClient } from "../../main";
+import { isEqual } from "../../utils/isObjectEqual";
 
 const UpdateSettingModal = () => {
     const { isUpdateSetting, closeUpdateSetting } = useModal();
@@ -32,6 +33,7 @@ const UpdateSettingModal = () => {
 
     const { mutate: changeSetting } = useMutation({
         mutationFn: () => {
+            if (isEqual(user?.setting, setting)) return;
             return axios.post(baseURL+APIsRoutes.User.UpdateSetting.path, setting, { headers: {
                 'session-id': localStorage.getItem('session-id')
             }});
