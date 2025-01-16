@@ -223,7 +223,7 @@ const PageMessage = () => {
             return <div className={"w-full h-fit flex py-0.5 px-2 gap-2 items-end " + (chat.sender === user?.username ? "justify-end" : "justify-start")} key={index}>
               {(index === messages?.data.length || messages?.data[index+1]?.sender !== chat.sender) ? renderSenderAvatar(chat) : <div className="w-7 h-7" />}
               <div 
-                className={"w-fit max-w-1/2 py-1.5 px-4 hover:cursor-text " 
+                className={"w-full max-w-96 py-1.5 px-4 hover:cursor-text " 
                   + getChatClassNames(messages?.data, index).join(" ")}
               >
                 {chat.content}

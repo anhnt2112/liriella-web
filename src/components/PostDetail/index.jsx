@@ -203,10 +203,7 @@ const PostDetail = () => {
                                 <div className="font-medium text-lg h-fit flex-grow flex flex-col">{post?.data.author.username}</div>
                             </div>
                             <div className="w-full pl-12 flex flex-col">
-                                <div className="flex">
-                                    <div className="italic underline font-medium">Book&apos;s name:</div>
-                                    &nbsp;
-                                    <div className="font-semibold flex-grow ">{post?.data.bookName}</div></div>
+                                <div className="font-semibold flex-grow ">Book&apos;s name:&nbsp;{post?.data.bookName}</div>
                                 <div>{post?.data.description}</div>
                             </div>
                         </div>

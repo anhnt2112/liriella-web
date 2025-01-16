@@ -22,6 +22,7 @@ import {
     NextButton,
     usePrevNextButtons
   } from '../../components/Carousel/ArrowButton';
+import { useNavigate } from "react-router-dom";
 
 const PageHome = () => {
     const { openDetailPost, openNoteCarousel } = useModal();
@@ -29,6 +30,7 @@ const PageHome = () => {
     const [postState, setPostState] = useState({});
     const { isLargeScreen } = useTailwindBreakpoint();
     const [emblaRef, emblaApi] = useEmblaCarousel();
+    const navigate = useNavigate();
 
     const {
         prevBtnDisabled,
@@ -66,7 +68,7 @@ const PageHome = () => {
 
     const { mutate } = useMutation({
         mutationFn: (id) => {
-            return axios.post(baseURL+APIsRoutes.User.FollowUser+`/${id}`, null, { headers: {
+            return axios.post(baseURL+APIsRoutes.User.FollowUser.path+`/${id}`, null, { headers: {
                 'session-id': localStorage.getItem('session-id')
             }});
         },
@@ -166,14 +168,14 @@ const PageHome = () => {
                     <DivIntersection className="w-full flex flex-col gap-3 select-none" action={() => action(post._id)} key={index}>
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <img src={post.author.avatar ? baseURL+post.author.avatar : DefaultAvatar} alt="" className="w-8 h-8 rounded-full object-cover object-center" />
+                                <img src={post.author.avatar ? baseURL+post.author.avatar : DefaultAvatar} alt="" className="w-8 h-8 rounded-full object-cover object-center hover:cursor-pointer" onClick={() => navigate(`/profile/${post.author.username}`)}/>
                                 <div className="flex gap-1">
-                                    <div className="font-medium">{post.author.username}</div>
+                                    <div className="font-medium hover:cursor-pointer" onClick={() => navigate(`/profile/${post.author.username}`)}>{post.author.username}</div>
                                     <div>&#x2022;</div>
                                     <div className="font-light">{defaultText(post.createdAt)}</div>
                                 </div>
                             </div>
-                            <img src={ThreeDot} alt="" className="w-4 hover:cursor-pointer" />
+                            <img src={ThreeDot} alt="" className="w-4 hover:cursor-pointer" onClick={() => openDetailPost(post._id)}/>
                         </div>
                         <img src={baseURL+post.image} alt="" className="w-full aspect-2/3 rounded-md hover:cursor-pointer" onClick={() => openDetailPost(post._id)}/>
                         <div className="w-full flex justify-between">
@@ -187,11 +189,7 @@ const PageHome = () => {
                         </div>
                         <div className="w-full flex flex-col">
                             <div className="font-medium hover:cursor-pointer">{`${post.likes} likes`}</div>
-                            <div className="flex">
-                                <div className="underline">Book's name:</div>
-                                &nbsp;
-                                <div className="font-medium">{post.bookName}</div>
-                            </div>
+                            <div className="font-medium">Book&apos;s name:&nbsp;{post.bookName}</div>
                             <div>{post.description}</div>
                             <div 
                                 className="font-light hover:cursor-pointer text-sm hover:text-slate-500"
@@ -206,7 +204,7 @@ const PageHome = () => {
             </div>
             {isLargeScreen && <div className="flex flex-col py-9 gap-3">
                 <div className="flex items-center gap-3 w-80">
-                    <img src={user?.avatar ? baseURL+user?.avatar : DefaultAvatar} className="w-14 h-14 rounded-full object-cover object-fit" />
+                    <img src={user?.avatar ? baseURL+user?.avatar : DefaultAvatar} className="w-14 h-14 rounded-full object-cover object-fit hover:cursor-pointer" onClick={() => navigate(`/profile`)}/>
                     <div className="flex flex-col flex-grow">
                         <div className="font-semibold">{user?.username}</div>
                         <div className="font-light">{user?.fullName}</div>
@@ -216,7 +214,7 @@ const PageHome = () => {
                 <div className="font-semibold opacity-50">Suggested for you</div>
                 {(suggested?.data.explore ?? []).map(item => (
                     <div className="flex items-center gap-3 w-80" key={item._id}>
-                        <img src={item?.avatar ? baseURL+item?.avatar : DefaultAvatar} className="w-14 h-14 rounded-full object-cover object-fit" />
+                        <img src={item?.avatar ? baseURL+item?.avatar : DefaultAvatar} className="w-14 h-14 rounded-full object-cover object-fit hover:cursor-pointer" onClick={() => navigate(`/profile/${item.author.username}`)}/>
                         <div className="flex flex-col flex-grow">
                             <div className="font-semibold">{item?.username}</div>
                             <div className="font-light">{item?.fullName}</div>
