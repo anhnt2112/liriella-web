@@ -65,7 +65,7 @@ const NoteCarousel = () => {
     
 
     return (showNoteCarousel &&
-        <div className="w-screen h-screen z-40 bg-black bg-opacity-50 fixed top-0 left-0 flex items-center justify-center select-none">
+        <div className="w-screen h-screen z-40 bg-black bg-opacity-90 fixed top-0 left-0 flex items-center justify-center select-none">
             <div className={"w-[400px] max-w-full h-full aspect-square rounded-xl flex flex-col py-4 relative"} ref={ref}>
                 <div className="w-full h-1 rounded-full bg-white" />
                 <PrevButton className="w-10 h-10 absolute left-0 top-1/2 -translate-x-1/2" onClick={onPrevButtonClick} disabled={prevBtnDisabled} />

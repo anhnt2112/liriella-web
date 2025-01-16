@@ -150,8 +150,8 @@ const PageHome = () => {
     return (
         <div className="flex justify-center gap-32">
             <div className="max-w-[630px] w-full flex h-screen overflow-y-scroll flex-col items-center">
-                <div className="w-full py-8 overflow-hidden relative select-none" ref={emblaRef}>
-                    <div className="flex gap-4 touch-pan-y touch-pinch-zoom">
+                <div className="w-full py-12 overflow-hidden relative select-none flex items-center" ref={emblaRef}>
+                    <div className="flex gap-4 h-fit items-center">
                         {(notesResponse?.data ?? []).map(note => (<>
                             <div className="w-16 h-16 rounded-full flex-none flex items-center justify-center hover:cursor-pointer" style={{
                                 background: "linear-gradient(270deg, #BA1313 0%, #BABA00 100%)"
