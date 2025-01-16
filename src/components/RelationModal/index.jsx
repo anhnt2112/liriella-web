@@ -24,20 +24,20 @@ const RelationModal = () => {
 
   const handleMouseEnter = (_username, ref) => {
     if (!ref) return;
-    const rect = ref.current.getBoundingClientRect();
-    openPreviewUser(_username, {
-      x: rect.left,
-      y: rect.bottom
-    });
+    // const rect = ref.current.getBoundingClientRect();
+    // openPreviewUser(_username, {
+    //   x: rect.left,
+    //   y: rect.bottom
+    // });
   }
 
   const handleMouseLeave = (event) => {
-    if (previewUserRef) {
-      const rect = previewUserRef.current.getBoundingClientRect();
-      if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) {
-        closePreviewUser();
-      }
-    }
+    // if (previewUserRef) {
+    //   const rect = previewUserRef.current.getBoundingClientRect();
+    //   if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) {
+    //     closePreviewUser();
+    //   }
+    // }
   }
 
   const handleGoToProfile = (username) => {
