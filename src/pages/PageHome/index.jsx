@@ -23,6 +23,7 @@ import {
     usePrevNextButtons
   } from '../../components/Carousel/ArrowButton';
 import { useNavigate } from "react-router-dom";
+import Tag, { tags } from "../../components/Tag";
 
 const PageHome = () => {
     const { openDetailPost, openNoteCarousel } = useModal();

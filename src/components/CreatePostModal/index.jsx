@@ -10,6 +10,8 @@ import DefaultAvatar from "../../assets/jpg/default_avt.jpg";
 import axios from "axios";
 import YesNoCheckBox from "../CheckBox/YesNo";
 import { toast } from "react-toastify";
+import PlusTag from "../TagSelect";
+import TagSelect from "../TagSelect";
 
 const CreatePostModal = () => {
   const { isCreatePost, closeCreatePost } = useModal();
@@ -152,7 +154,7 @@ const CreatePostModal = () => {
               <img className="w-10 h-10 rounded-full" src={user?.avatar ? baseURL+user?.avatar : DefaultAvatar} />
               <div className="flex-grow font-medium text-base">{user?.username}</div>
             </div>
-            <textarea maxLength={2024} className="h-1/2 p-1 text-sm focus:outline-none" placeholder="Description" value={content?.description} onChange={(e) => setContent({...content, description: e.target.value})} />
+            <textarea maxLength={2024} className="h-2/5 p-1 text-sm focus:outline-none" placeholder="Description" value={content?.description} onChange={(e) => setContent({...content, description: e.target.value})} />
             <input className="p-1 text-sm focus:outline-none" placeholder="Book's name" value={content?.bookName} onChange={(e) => setContent({...content, bookName: e.target.value})} />
             <input className="p-1 text-sm focus:outline-none" placeholder="Link to buy" value={content?.linkToBuy} onChange={(e) => setContent({...content, linkToBuy: e.target.value})} />
             <div className="w-full flex items-center justify-between p-1">
@@ -172,6 +174,9 @@ const CreatePostModal = () => {
                 />
               </motion.div> */}
               <YesNoCheckBox value={content?.isFavorite} onClick={() => setContent({...content, isFavorite: !content?.isFavorite})} />
+            </div>
+            <div className="flex p-1 gap-1">
+              <TagSelect />
             </div>
           </div>}
         </div>
