@@ -184,7 +184,7 @@ const PageMessage = () => {
           <div className="overflow-hidden w-full select-none" ref={emblaRef}>
             <div className="w-full h-fit py-5 px-4 flex gap-3 touch-pan-y touch-pinch-zoom">
               {(notesResponse?.data ?? []).map(note => (
-              <div className="relative flex justify-center pt-8 w-24">
+              <div className="relative flex justify-center pt-8 w-24 flex-none">
                 <img src={note.user.avatar ? baseURL+note.user.avatar : DefaultAvatar} className="rounded-full w-16 h-16" draggable={false} />
                 <NoteBox className="top-0 left-0 max-w-full h-12 text-[10px]" note={note.content}/>
               </div>))}
@@ -200,7 +200,7 @@ const PageMessage = () => {
               <div className="w-full px-5 py-2 hover:bg-slate-50 flex gap-3 hover:cursor-pointer" key={conversation._id} onClick={() => handleGotoConversation(conversation._id)}>
                 <img src={baseURL+conversation.avatar} alt="" draggable={false} className="w-12 h-12 rounded-full object-cover object-center" />
                 <div className="flex-grow flex flex-col justify-center">
-                  <div className="w-full text-base">{conversation.name}</div>
+                  <div className="w-full text-base">{conversation.participants.length < 3 ? conversation.participants.filter(p => user.username !== p) : conversation.name}</div>
                   <div className="w-full text-xs font-light">{renderLastMessage(conversation)}</div>
                 </div>
               </div>
@@ -213,7 +213,7 @@ const PageMessage = () => {
           <div className="py-10 flex flex-col items-center gap-2">
             <img src={baseURL+conversationInfo?.avatar} alt="" draggable={false} className="w-24 h-24 rounded-full object-cover object-center" />
             <div className="flex flex-col items-center">
-              <div className="text-2xl font-semibold">{conversationInfo?.name}</div>
+              <div className="text-2xl font-semibold">{conversationInfo?.participants.length < 3 ? conversationInfo.participants.filter(p => user.username !== p) : conversationInfo?.name}</div>
               <div className="opacity-70">{conversationInfo?.participants.join(', ')}</div>
             </div>
             <div className="w-fit h-fit py-2 font-light underline">{defaultText(conversationInfo?.createdAt)}</div>
@@ -223,7 +223,7 @@ const PageMessage = () => {
             return <div className={"w-full h-fit flex py-0.5 px-2 gap-2 items-end " + (chat.sender === user?.username ? "justify-end" : "justify-start")} key={index}>
               {(index === messages?.data.length || messages?.data[index+1]?.sender !== chat.sender) ? renderSenderAvatar(chat) : <div className="w-7 h-7" />}
               <div 
-                className={"w-full max-w-96 py-1.5 px-4 hover:cursor-text " 
+                className={"w-fit max-w-96 py-1.5 px-4 hover:cursor-text " 
                   + getChatClassNames(messages?.data, index).join(" ")}
               >
                 {chat.content}

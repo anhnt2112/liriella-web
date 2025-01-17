@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { baseURL, APIsRoutes } from "../../utils/services/ApiService";
 import axios from "axios";
 
@@ -22,6 +22,7 @@ const PageProfile = () => {
   const { user } = useUser();
   const username = (location.pathname.split("/")[2] ?? user?.username) ?? ""; 
   const { openRelationModal, setInFollowing, setInFollowers, openChangeAvatar, openCreateNote, openUpdateInfo, openUpdateSetting } = useModal();
+  const queryClient = useQueryClient();
 
   const { data: profile, isLoading: isProfileLoading, refetch } = useQuery({
     queryKey: ['profileInfo', username],
@@ -64,6 +65,10 @@ const PageProfile = () => {
       }});
     },
     onSuccess: () => {
+      queryClient.refetchQueries('profile');
+      queryClient.refetchQueries('suggested');
+      queryClient.refetchQueries('followingPosts');
+      queryClient.refetchQueries('explore');
       refetch();
     }
   });

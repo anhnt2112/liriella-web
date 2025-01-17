@@ -150,7 +150,7 @@ const PageHome = () => {
     return (
         <div className="flex justify-center gap-32">
             <div className="max-w-[630px] w-full flex h-screen overflow-y-scroll flex-col items-center">
-                {notesResponse?.data?.length && <div className="w-full py-12 overflow-hidden relative select-none flex items-center" ref={emblaRef}>
+                {notesResponse?.data?.length > 0 && <div className="w-full py-12 overflow-hidden relative select-none flex items-center" ref={emblaRef}>
                     <div className="flex gap-4 h-fit items-center">
                         {(notesResponse?.data ?? []).map(note => (<>
                             <div className="w-16 h-16 rounded-full flex-none flex items-center justify-center hover:cursor-pointer" style={{
@@ -163,7 +163,7 @@ const PageHome = () => {
                     {/* <PrevButton className="w-6 h-6 absolute left-2 top-[52px]" onClick={onPrevButtonClick} disabled={prevBtnDisabled} /> */}
                     {/* <NextButton className="w-6 h-6 absolute right-2 top-[52px]" onClick={onNextButtonClick} disabled={nextBtnDisabled} /> */}
                 </div>}
-                <div className="max-w-[470px] w-full flex flex-col gap-3 pb-5">
+                <div className="max-w-[470px] w-full flex flex-col gap-3 py-5">
                     {followingPosts?.data.posts.map((post, index) => (
                     <DivIntersection className="w-full flex flex-col gap-3 select-none" action={() => action(post._id)} key={index}>
                         <div className="flex items-center justify-between">

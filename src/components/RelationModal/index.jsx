@@ -6,12 +6,14 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import CloseIcon from "../../assets/svg/close.svg";
 import DefaultAvatar from "../../assets/jpg/default_avt.jpg";
+import useUser from "../../context/useUser";
 
 const RelationModal = () => {
   const { relationID, openRelationModal, closeRelationModal, inFollowers, setInFollowing, setInFollowers, openPreviewUser, closePreviewUser, previewUserRef } = useModal();
   const avatarRef = useRef(null);
   const usernameRef = useRef(null);
   const navigate = useNavigate();
+  const { user: currentUser } = useUser();
 
   const { data, isLoading } = useQuery({
     queryKey: ['relation', relationID],
@@ -79,7 +81,7 @@ const RelationModal = () => {
                 <div className="text-sm font-medium hover:cursor-pointer" ref={usernameRef} onMouseEnter={() => handleMouseEnter(user._id, usernameRef)} onMouseLeave={handleMouseLeave} onClick={() => handleGoToProfile(user.username)}>{user.username}</div>
                 <div className="text-base font-normal opacity-70">{user.fullName}</div>
               </div>
-              <div className="w-28 h-8 flex items-center justify-center rounded-xl bg-[#EFEFEF] hover:cursor-pointer hover:bg-[#d7d7d7] text-sm font-medium">Following</div>
+              <div className={"w-28 h-8 flex items-center justify-center rounded-xl hover:cursor-pointer hover:bg-[#d7d7d7] text-sm font-medium " + ([currentUser._id, ...currentUser?.following].includes(user._id) ? "bg-[#EFEFEF]" : "bg-ui-blue text-white")}>{currentUser?.following.includes(user._id) ? 'Following' : 'Follow'}</div>
             </div>
           ))}
         </div>
