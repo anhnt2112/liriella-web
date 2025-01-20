@@ -91,8 +91,8 @@ export const tags = [
 
 const Tag = ({ tag, onClick, isActive = false, className = "text-xs" }) => {
   return (
-    <div className={"p-1 rounded-lg w-fit h-fit select-none hover:cursor-pointer flex-none flex gap-1 items-center " + className} style={{ backgroundColor: tag.backgroundColor, color: tag.textColor }} onClick={onClick}>
-      {tag.label}
+    <div className={"p-1 rounded-lg w-fit h-fit select-none hover:cursor-pointer flex-none flex gap-1 items-center " + className} style={{ backgroundColor: tag?.backgroundColor || "black", color: tag?.textColor || "white" }} onClick={onClick}>
+      {tag?.label || ""}
       {isActive && <div className="w-2 h-2 rounded-full" style={{ backgroundColor: tag.textColor }} />}
     </div>
   );

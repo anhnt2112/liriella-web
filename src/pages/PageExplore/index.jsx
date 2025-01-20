@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import PostPreview from "../../components/PostPreview";
@@ -16,11 +16,11 @@ const PageExplore = () => {
         }
     });
 
-    const [selectedTag, setSelectedTag] = React.useState("All");
+    const [selectedTags, setSelectedTags] = useState([]);
 
     return (
         <div className="w-full h-screen flex flex-col items-center select-none gap-3 p-3 overflow-y-scroll">
-            <TagCarousel selectedTag={selectedTag} setSelectedTag={setSelectedTag} />
+            <TagCarousel selectedTags={selectedTags} setSelectedTags={setSelectedTags}  />
             {explorePost?.data.posts.map((post, index) => index % 3 === 0 && (
                 <div className="w-full flex gap-3 items-center">
                     <div className="w-1/3 aspect-2/3">

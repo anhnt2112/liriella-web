@@ -125,7 +125,7 @@ const PageProfile = () => {
 
   return (
     <div className="w-full h-screen flex justify-center select-none">
-      <div className="w-full max-w-[1024px]">
+      <div className="w-full max-w-[1024px] h-full overflow-y-scroll">
         {/* Profile */}
         {isProfileLoading ? <div>Loading...</div> : profile?.data ? 
         <div className="w-full px-20 py-10 flex items-center gap-5 md:gap-10 lg:gap-20">

@@ -56,6 +56,12 @@ export const APIsRoutes = {
         },
         GetNotes: {
             path: '/post/notes'
+        },
+        CreateRate: {
+            path: '/rating/rate'
+        },
+        GetRate: {
+            path: '/rating/rate'
         }
     },
     User: {

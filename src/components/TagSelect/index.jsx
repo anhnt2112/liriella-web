@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import Tag, { tags } from "../Tag";
 
-const TagSelect = ({ className, ...props }) => {
-  const [isOpenSelect, setIsOpenSelect] = useState(false);
-  const [selectedTags, setSelectedTags] = useState([]);
-
+const TagSelect = ({ className, selectedTags, setSelectedTags, ...props }) => {
   const handleClickTag = (tag) => {
     if (selectedTags.includes(tag.label)) {
       setSelectedTags(selectedTags.filter(item => item !== tag.label));

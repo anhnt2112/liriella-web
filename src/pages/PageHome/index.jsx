@@ -148,6 +148,12 @@ const PageHome = () => {
         window.location.reload();
     }
 
+    const renderTags = (tagList) => {
+        return <div className="flex flex-wrap gap-2">
+            {tagList.map(tag => <Tag tag={tags.find(item => item.label === tag)} />)}
+        </div>;
+    }
+
     return (
         <div className="flex justify-center gap-32">
             <div className="max-w-[630px] w-full flex h-screen overflow-y-scroll flex-col items-center">
@@ -173,6 +179,7 @@ const PageHome = () => {
                                 <div className="flex gap-1">
                                     <div className="font-medium hover:cursor-pointer" onClick={() => navigate(`/profile/${post.author.username}`)}>{post.author.username}</div>
                                     <div>&#x2022;</div>
+                                    {renderTags(post?.tags || [])}
                                     <div className="font-light">{defaultText(post.createdAt)}</div>
                                 </div>
                             </div>

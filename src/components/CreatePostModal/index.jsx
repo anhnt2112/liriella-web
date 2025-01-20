@@ -20,6 +20,7 @@ const CreatePostModal = () => {
   const [content, setContent] = useState(null);
   const [step, setStep] = useState(0);
   const [showDiscardPost, setShowDiscardPost] = useState(false);
+  const [selectedTags, setSelectedTags] = useState([]);
   const createPostRef = useRef(null);
   const { user } = useUser();
 
@@ -45,6 +46,7 @@ const CreatePostModal = () => {
       formData.append("bookName", content.bookName);
       formData.append("linkToBuy", content.linkToBuy);
       formData.append("isFavorite", content.isFavorite);
+      formData.append("tags", selectedTags);
 
       return axios.post(baseURL+APIsRoutes.Post.Create.path, formData, { headers: {
         'session-id': localStorage.getItem('session-id')
@@ -176,7 +178,7 @@ const CreatePostModal = () => {
               <YesNoCheckBox value={content?.isFavorite} onClick={() => setContent({...content, isFavorite: !content?.isFavorite})} />
             </div>
             <div className="flex p-1 gap-1">
-              <TagSelect />
+              <TagSelect selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
             </div>
           </div>}
         </div>

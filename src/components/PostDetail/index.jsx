@@ -17,6 +17,9 @@ import MultipleStateIcon from "../MultipleStateIcon";
 import useUser from "../../context/useUser";
 import DeleteIcon from "../../assets/png/trash.png";
 import CreateIcon from "../../assets/png/create.png";
+import Star from "../StarRating/star";
+import StarRating from "../StarRating";
+import Tag, { tags } from "../Tag";
 
 const PostDetail = () => {
     const { detailPostId, closeDetailPost } = useModal();
@@ -26,6 +29,7 @@ const PostDetail = () => {
     const [content, setContent] = useState("");
     const [replyComment, setReplyComment] = useState(null);
     const [expands, setExpands] = useState({});
+    const [rate, setRate] = useState(-1);
 
     const { data: post, isLoading: isPostLoading, refetch: refetchPost } = useQuery({
         queryKey: ["postDetail", detailPostId],
@@ -105,6 +109,37 @@ const PostDetail = () => {
         enabled: !!detailPostId
     });
 
+    const { data: postRate, refetch: refetchPostRate } = useQuery({
+        queryKey: ['postRate', detailPostId],
+        queryFn: () => {
+            return axios.get(baseURL+APIsRoutes.Post.GetRate.path+'/'+detailPostId);
+        },
+        enabled: !!detailPostId
+    });
+
+    useEffect(() => {
+        const currentRate = postRate?.data.find(item => item.author === user._id);
+        console.log(currentRate);
+        setRate(currentRate?.rate || -1);
+    }, [postRate]);
+
+    const { mutate: updateRate } = useMutation({
+        mutationFn: (rate) => {
+            return axios.post(baseURL+APIsRoutes.Post.CreateRate.path, { rate, postId: detailPostId }, { headers: {
+                'session-id': localStorage.getItem('session-id')
+            }})
+        },
+        onSuccess: () => {
+            refetchPostRate();
+            refetchPost();
+        }
+    });
+
+    useEffect(() => {
+        if (rate !== -1)
+        updateRate(rate);
+    }, [rate]);
+
     const checkLike = (commentId) => {
         if (!comments?.data.all) return false;
         return comments?.data.all.filter((comment) => {
@@ -174,12 +209,15 @@ const PostDetail = () => {
     }
 
     const handleLikeComment = (commentId) => {
-        console.log(commentId);
         if (!checkLike(commentId)) likePost(commentId);
         else unlikePost(commentId);
     }
 
-    console.log(comments);
+    const renderTags = (tagList) => {
+        return <div className="flex flex-wrap gap-2">
+            {tagList.map(tag => <Tag tag={tags.find(item => item.label === tag)} />)}
+        </div>;
+    }
 
     return (<>
         {detailPostId && <div className="w-screen h-screen z-40 bg-black bg-opacity-50 fixed top-0 left-0 flex items-center justify-center select-none">
@@ -192,6 +230,10 @@ const PostDetail = () => {
                         <img src={post?.data.author.avatar ? baseURL+post?.data.author.avatar : DefaultAvatar} alt="" className="w-9 h-9 rounded-full object-cover object-center" />
                         <div className="font-medium text-lg h-fit flex-grow">{post?.data.author.username}</div>
                         {post?.data?.author._id === user?._id && <div className="flex gap-1">
+                            {post?.data.author.username === user?.username &&
+                            <div className="flex-grow flex justify-end">
+                                <MultipleStateIcon defaultIcon={HeartIcon} hoverIcon={HeartHoverIcon} activeIcon={HeartFilledIcon} className="hover:cursor-pointer w-5" />
+                            </div>}
                             <img src={CreateIcon} className="w-5 h-5 hover:cursor-pointer" />
                             <img src={DeleteIcon} className="w-5 h-5 hover:cursor-pointer" />
                         </div>}
@@ -205,6 +247,7 @@ const PostDetail = () => {
                             <div className="w-full pl-12 flex flex-col">
                                 <div className="font-semibold flex-grow ">Book&apos;s name:&nbsp;{post?.data.bookName}</div>
                                 <div>{post?.data.description}</div>
+                                {renderTags(post?.data.tags || [])}
                             </div>
                         </div>
                         {comments?.data.all.filter(item => !!item.content && !item.comment).map((comment, index) => (
@@ -250,13 +293,13 @@ const PostDetail = () => {
                         <div className="w-full flex gap-2">
                             <MultipleStateIcon defaultIcon={LikeIcon} hoverIcon={LikeHoverIcon} activeIcon={LikeFilledIcon} isActive={checkLike(null)} className="hover:cursor-pointer w-7" onClick={handleClickLike} />
                             <MultipleStateIcon defaultIcon={CommentIcon} hoverIcon={CommentFilledIcon} className="hover:cursor-pointer w-7" onClick={handleFocus} />
-                            {post?.data.author.username === user?.username &&
-                            <div className="flex-grow flex justify-end">
-                                <MultipleStateIcon defaultIcon={HeartIcon} hoverIcon={HeartHoverIcon} activeIcon={HeartFilledIcon} className="hover:cursor-pointer w-7" />
-                            </div>}
+                            <StarRating rate={rate} setRate={setRate} />
                         </div>
                         <div className="flex flex-col">
-                            <div className="text-base font-medium">{`${post?.data.likes} likes`}</div>
+                            <div className="flex justify-between">
+                                <div className="text-base font-medium">{`${post?.data.likes} likes`}</div>
+                                <div className="text-base font-medium">{post?.data?.rate}{' '}Ratings{!!post?.data?.rate && ' · ' + post?.data.average + ' average'}</div>
+                            </div>
                             <div className="font-light text-xs">{defaultText(post?.data.createdAt)}</div>
                         </div>
                     </div>

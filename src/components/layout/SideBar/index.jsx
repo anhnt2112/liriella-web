@@ -31,14 +31,19 @@ import DefaultAvatarFilled from "../../../assets/png/avatar_filled.png";
 import BookIcon from "../../../assets/png/book.png";
 import DefaultAvt from "../../../assets/jpg/default_avt.jpg";
 
+import TagIcon from "../../../assets/png/tag.png";
+import LinkIcon from "../../../assets/png/link.png";
+
 import useTailwindBreakpoint from "../../../context/useTailwindBreakpoint";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useModal } from "../../../context/useModal";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { APIsRoutes, baseURL } from "../../../utils/services/ApiService";
 import useNotificationSocket from "../../../context/useNotificationSocket";
 import useUser from "../../../context/useUser";
+import TagSelect from "../../TagSelect";
+import Tag, { tags } from "../../Tag";
 
 const SideBar = () => {
     const { currentBreakpoint } = useTailwindBreakpoint();
@@ -57,6 +62,8 @@ const SideBar = () => {
         isPost: false,
         isComment: false
     });
+    const [onSelectTags, setOnSelectTags] = useState(false);
+    const [selectedTags, setSelectedTags] = useState([]);
 
     const sideBarItems = [
         {
@@ -260,17 +267,11 @@ const SideBar = () => {
         openDetailPost(postId);
     }
 
-    console.log(notification?.data.filter(noti => {
-        if (!notiState.isPost) {
-            return !noti.postId;
-        } else {
-            if (notiState.isComment) {
-                return noti.postId && noti.commentId;
-            } else {
-                return noti.postId && !noti.commentId;
-            }
-        }
-    }));
+    const renderTags = (tagList) => {
+        return <div className="flex flex-wrap gap-2">
+            {tagList.map(tag => <Tag tag={tags.find(item => item.label === tag)} />)}
+        </div>;
+    }
 
     return (<div className="w-fit h-full flex relative" ref={sidebarRef}>
         <motion.div 
@@ -354,15 +355,26 @@ const SideBar = () => {
                     Search
                 </div>
                 <div className="w-full flex flex-col flex-grow gap-3">
-                    <div className="px-3">
+                    <div className="px-3 flex gap-1.5 relative">
                         <div className="h-10 rounded-md bg-[#EFEFEF] flex overflow-hidden">
                             <motion.div className={onSearchByUsername ? "flex-grow" : "flex-grow-0 hover:cursor-pointer hover:bg-slate-200 px-2 flex items-center justify-center"} onClick={switchToUsernameSearch}>
-                                {onSearchByUsername ? <input className="px-3 h-full text-sm bg-transparent focus:outline-none" placeholder="Search by username" value={searchContent} onChange={(e) => setSearchContent(e.target.value)}/> : <img src={DefaultAvatar} alt="" className="h-6" />}
+                                {onSearchByUsername ? <input className="px-3 h-full text-sm bg-transparent focus:outline-none" placeholder="Search by username" value={searchContent} onChange={(e) => setSearchContent(e.target.value)}/> : <img src={DefaultAvatar} alt="" className="w-6" />}
                             </motion.div>
                             <motion.div className={"border-l-[1px] border-ui-input-stroke " +  (!onSearchByUsername ? "flex-grow" : "flex-grow-0 hover:cursor-pointer hover:bg-slate-200 px-2 flex items-center justify-center")} onClick={switchToBookNameSearch}>
-                                {!onSearchByUsername ? <input className="px-3 h-full text-sm bg-transparent focus:outline-none" placeholder={`Search by book${`'`}s name`} value={searchContent} onChange={(e) => setSearchContent(e.target.value)}/> : <img src={BookIcon} alt="" className="h-6"/>}
+                                {!onSearchByUsername ? <input className="px-3 h-full text-sm bg-transparent focus:outline-none" placeholder={`Search by book${`'`}s name`} value={searchContent} onChange={(e) => setSearchContent(e.target.value)}/> : <img src={BookIcon} alt="" className="w-6"/>}
                             </motion.div>
                         </div>
+                        <div className="h-full aspect-square rounded-md bg-[#EFEFEF] flex items-center justify-center hover:cursor-pointer hover:bg-slate-200" onClick={() => setOnSelectTags(!onSelectTags)}>
+                            <img src={!onSearchByUsername ? TagIcon : LinkIcon} className="w-4 h-4" />
+                        </div>
+                        {onSelectTags && <div className="bg-white rounded-md absolute right-3 top-[calc(100%+4px)] w-80 p-2 z-20" style={{
+                            boxShadow: "0 0 4px rgba(0, 0, 0, 0.3)"
+                        }}>
+                            {!onSearchByUsername && <TagSelect selectedTags={selectedTags} setSelectedTags={setSelectedTags} />}
+                        </div>}
+                    </div>
+                    <div className="px-3">
+                        {!onSearchByUsername && renderTags(selectedTags)}
                     </div>
                     <div className="flex-grow overflow-hidden overflow-y-scroll">
                         {(searchResult?.data ?? []).map((item, index) => (
@@ -383,9 +395,9 @@ const SideBar = () => {
                                 <div className="flex-grow flex flex-col justify-center text-md">
                                     <div className="font-medium">{item.bookName}</div>
                                     <div className="font-normal text-md flex overflow-hidden gap-1">
-                                        <div>{`${item.likes} likes`}</div>
+                                        <div>{`${item.rate} ratings`}</div>
                                         &#x2022;
-                                        <div>{`${item.comments} comments`}</div>
+                                        <div>{`${item.average ?? 0} average`}</div>
                                     </div>
                                     <div className="font-normal opacity-70 text-md flex overflow-hidden gap-1">
                                         <div>{item.author.username}</div>
