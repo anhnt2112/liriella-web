@@ -30,6 +30,9 @@ export const APIsRoutes = {
         Create: {
             path: "/post/create",
         },
+        UpdatePost: {
+            path: "/post/update"
+        },
         GetProfile: {
             path: "/post/get-posts-by-user-id"
         },
