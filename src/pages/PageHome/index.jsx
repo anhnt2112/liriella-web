@@ -149,6 +149,7 @@ const PageHome = () => {
     }
 
     const renderTags = (tagList) => {
+        console.log(tagList);
         return <div className="flex flex-wrap gap-2">
             {tagList.map(tag => <Tag tag={tags.find(item => item.label === tag)} />)}
         </div>;
@@ -179,7 +180,6 @@ const PageHome = () => {
                                 <div className="flex gap-1">
                                     <div className="font-medium hover:cursor-pointer" onClick={() => navigate(`/profile/${post.author.username}`)}>{post.author.username}</div>
                                     <div>&#x2022;</div>
-                                    {renderTags(post?.tags || [])}
                                     <div className="font-light">{defaultText(post.createdAt)}</div>
                                 </div>
                             </div>
@@ -199,6 +199,7 @@ const PageHome = () => {
                             <div className="font-medium hover:cursor-pointer">{`${post.likes} likes`}</div>
                             <div className="font-medium">Book&apos;s name:&nbsp;{post.bookName}</div>
                             <div>{post.description}</div>
+                            {post?.tags?.length > 0 && renderTags(post?.tags || [])}
                             <div 
                                 className="font-light hover:cursor-pointer text-sm hover:text-slate-500"
                                 onClick={() => openDetailPost(post._id)}

@@ -21,7 +21,10 @@ const PageExplore = () => {
     return (
         <div className="w-full h-screen flex flex-col items-center select-none gap-3 p-3 overflow-y-scroll">
             <TagCarousel selectedTags={selectedTags} setSelectedTags={setSelectedTags}  />
-            {explorePost?.data.posts.map((post, index) => index % 3 === 0 && (
+            {explorePost?.data.posts.filter(p => {
+                if (selectedTags.length === 0) return true;
+                return selectedTags.every(item => p?.tags.includes(item));
+            }).map((post, index) => index % 3 === 0 && (
                 <div className="w-full flex gap-3 items-center">
                     <div className="w-1/3 aspect-2/3">
                         <PostPreview post={post} />
